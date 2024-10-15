@@ -1,6 +1,9 @@
 # Có thể chịu trách nhiệm tải dữ liệu
 import pandas as pd
 
-data_temp = pd.read_csv("data/raw/data_raw.csv")
 
-print(data_temp)
+def ReadFile(_PATH):
+    """Read file raw"""
+    data_temp = pd.read_csv(_PATH)
+    
+    return data_temp
