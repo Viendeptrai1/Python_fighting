@@ -1,6 +1,15 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\data",
+    "\\data\\processed",
+    "\\data\\raw",
+    "\\src",
+    "\\src\\analysis",
+    "\\src\\data",
+    "\\src\\gui",
+    "\\src\\visualization"
   ],
+  "SelectedNode": "\\src",
   "PreviewInSolutionExplorer": false
 }
