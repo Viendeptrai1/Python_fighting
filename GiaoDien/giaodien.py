@@ -26,7 +26,11 @@ class GiaoDien:
         self.frame_tabs.pack(fill='x', padx=20, pady=10)
 
         # Các nút tab
-        self.tabs = ["Biểu đồ cột", "Biểu đồ tròn"]
+        self.tabs = ["Biểu đồ cột"
+                     , "Biểu đồ tròn"
+                     , "Biểu đồ doanh thu trung bình theo loại khách hàng"
+                     , "Biểu đồ số lượng sản phẩm theo dòng sản phẩm"
+                     , "Biểu đồ lợi nhuận trung bình theo chi nhánh"]
         self.buttons = []
         
         for idx, tab_name in enumerate(self.tabs):
@@ -67,7 +71,13 @@ class GiaoDien:
             
             elif tab_name == "Biểu đồ tròn":
                 self.truc_quan_hoa.ve_bieu_do_tron("Product line")
-            
+            elif tab_name == "Biểu đồ doanh thu trung bình theo loại khách hàng":
+                self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.doanh_thu_trung_binh_theo_loai_KH())
+            elif tab_name == "Biểu đồ số lượng sản phẩm theo dòng sản phẩm":
+                self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.so_luong_san_pham_theo_dong_SP())
+            elif tab_name == "Biểu đồ lợi nhuận trung bình theo chi nhánh":
+                self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.loi_nhuan_gop_trung_binh_theo_CN())
+    
             else:
                 print("Loại biểu đồ không hợp lệ.")
         except Exception as e:

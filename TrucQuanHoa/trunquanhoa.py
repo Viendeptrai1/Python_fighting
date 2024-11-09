@@ -37,3 +37,9 @@ class TrucQuanHoa:
         plt.title(f'Biểu đồ tròn của {cot_danh_muc}')
         plt.ylabel('')
         plt.show()
+        
+    def ve_bieu_do_cot(self, series):
+        plt.figure(figsize=(8, 6))
+        series.plot(kind = "bar", color = "blue", edgecolor = "black")    
+        plt.xticks(rotation = 0)
+        plt.show()

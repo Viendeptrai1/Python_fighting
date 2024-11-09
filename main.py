@@ -10,8 +10,8 @@ def main():
         return
     xu_ly_du_lieu = XuLyDuLieu(du_lieu.lay_du_lieu())
     xu_ly_du_lieu.lam_sach_du_lieu()
-    xu_ly_du_lieu.tinh_them_chi_so()
     xu_ly_du_lieu.chuyen_doi_du_lieu()
+    
     truc_quan_hoa = TrucQuanHoa(du_lieu.lay_du_lieu())
 
     # Khởi tạo cửa sổ giao diện chính
