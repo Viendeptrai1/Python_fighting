@@ -1,1 +1,0 @@
-# Triển khai giao diện chính của ứng dụng

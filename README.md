@@ -1,2 +1,0 @@
-# Readme
-do an python
