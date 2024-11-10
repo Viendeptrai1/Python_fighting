@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\GiaoDien",
+    "\\TrucQuanHoa",
+    "\\XuLyDuLieu"
   ],
-  "SelectedNode": "\\D:\\Learning\\Laptrinhpython\\Project_fighting",
+  "SelectedNode": "\\TrucQuanHoa\\trunquanhoa.py",
   "PreviewInSolutionExplorer": false
 }
