@@ -43,3 +43,14 @@ class TrucQuanHoa:
         series.plot(kind = "bar", color = "blue", edgecolor = "black")    
         plt.xticks(rotation = 0)
         plt.show()
+    
+    def ve_bieu_do_so_luong_moi_gioi_tinh_theo_SP(self, df):
+        plt.figure(figsize=(12, 6))
+        sns.countplot(x='Product line', hue='Gender', data = df)
+        plt.title('Number of Each Gender by Product line')
+        plt.xlabel('Product line')
+        plt.ylabel('Count')
+        plt.legend(title='Gender')
+        plt.show()
+
+    

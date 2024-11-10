@@ -39,6 +39,19 @@ class XuLyDuLieu:
     def loi_nhuan_gop_trung_binh_theo_CN(self):
         # Lợi nhuận gộp trung bình theo chi nhánh
         return self.du_lieu.groupby('Branch')['gross income'].mean()
+    
+    def doanh_thu_trung_binh_theo_ngay(self):
+        # Doanh thu trung bình theo ngày trong tuần
+        return self.du_lieu.groupby('Date')['Total'].mean()
+    
+    def diem_danh_gia_trung_binh_theo_dong_SP(self):
+        # Điểm đánh giá trung bình theo dòng sản phẩm
+        return self.du_lieu.groupby('Product line')['Rating'].mean()
+    
+    def ty_le_khach_hang_theo_gioi_tinh(self):
+        # Tỷ lệ khách hàng theo giới tính
+        return self.du_lieu['Gender'].value_counts(normalize = True)*100
+    
         
     def chuyen_doi_du_lieu(self):
         """

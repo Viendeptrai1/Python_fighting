@@ -3,6 +3,7 @@ from XuLyDuLieu.xulydulieu import XuLyDuLieu
 from TrucQuanHoa.trunquanhoa import TrucQuanHoa
 from GiaoDien.giaodien import GiaoDien
 import customtkinter as ctk
+import matplotlib.pyplot as plt
 
 def main():
     du_lieu = DuLieu("Data/data_sales.csv")

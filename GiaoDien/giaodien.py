@@ -113,6 +113,8 @@ class GiaoDien:
             "Biểu đồ doanh thu trung bình theo loại khách hàng",
             "Biểu đồ số lượng sản phẩm theo dòng sản phẩm",
             "Biểu đồ lợi nhuận trung bình theo chi nhánh",
+            "Điểm đánh giá trung bình theo dòng sản phẩm",
+            "Số lượng mỗi giới tính theo sản phẩm",
             "Xem Info dataframe",
             "Biểu đồ đường",
             "Biểu đồ scatter",
@@ -212,6 +214,11 @@ class GiaoDien:
                     self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.so_luong_san_pham_theo_dong_SP())
                 elif tab_name == "Biểu đồ lợi nhuận trung bình theo chi nhánh":
                     self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.loi_nhuan_gop_trung_binh_theo_CN())
+                elif tab_name == "Điểm đánh giá trung bình theo dòng sản phẩm":
+                    self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.diem_danh_gia_trung_binh_theo_dong_SP())
+                elif tab_name == "Số lượng mỗi giới tính theo sản phẩm":
+                    self.truc_quan_hoa.ve_bieu_do_so_luong_moi_gioi_tinh_theo_SP(self.xu_ly_du_lieu.du_lieu)
+               
                     
         except Exception as e:
             self.frame_chart.pack_forget()
