@@ -116,29 +116,13 @@ class GiaoDien:
             "Điểm đánh giá trung bình theo dòng sản phẩm",
             "Số lượng mỗi giới tính theo sản phẩm",
             "Xem Info dataframe",
-            "Biểu đồ đường",
-            "Biểu đồ scatter",
-            "Biểu đồ box",
-            "Biểu đồ violin",
-            "Biểu đồ heat map",
-            "Biểu đồ bar stack",
-            "Biểu đồ area",
-            "Biểu đồ bubble",
-            "Thống kê mô tả",
-            "Phân tích tương quan",
-            "Biểu đồ cột", 
-            "Biểu đồ tròn", 
-            "Xem Info dataframe",
-            "Biểu đồ đường",
-            "Biểu đồ scatter",
-            "Biểu đồ box",
-            "Biểu đồ violin",
-            "Biểu đồ heat map",
-            "Biểu đồ bar stack",
-            "Biểu đồ area",
-            "Biểu đồ bubble",
-            "Thống kê mô tả",
-            "Phân tích tương quan"
+            "Doanh thu theo Chi nhánh và Loại khách hàng",
+            "Xu hướng doanh thu theo thời gian của các chi nhánh",
+            "Phân phối giá bán theo dòng sản phẩm",
+            "Phân phối doanh thu theo phương thức thanh toán",
+            "So sánh doanh thu theo giới tính",
+            "Phân phối điểm đánh giá theo dòng sản phẩm",
+            "Số lượng bán ra theo thành phố và dòng sản phẩm",
         ]
         self.buttons = []
         
@@ -209,15 +193,64 @@ class GiaoDien:
                 elif tab_name == "Biểu đồ tròn":
                     self.truc_quan_hoa.ve_bieu_do_tron("Product line", self.frame_chart)
                 elif tab_name == "Biểu đồ doanh thu trung bình theo loại khách hàng":
-                    self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.doanh_thu_trung_binh_theo_loai_KH())
+                    self.truc_quan_hoa.ve_doanh_thu_trung_binh_theo_loai_KH(self.xu_ly_du_lieu)
                 elif tab_name == "Biểu đồ số lượng sản phẩm theo dòng sản phẩm":
-                    self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.so_luong_san_pham_theo_dong_SP())
+                    self.truc_quan_hoa.ve_so_luong_san_pham_theo_dong_SP(self.xu_ly_du_lieu)
                 elif tab_name == "Biểu đồ lợi nhuận trung bình theo chi nhánh":
-                    self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.loi_nhuan_gop_trung_binh_theo_CN())
+                    self.truc_quan_hoa.ve_loi_nhuan_gop_trung_binh_theo_CN(self.xu_ly_du_lieu)
                 elif tab_name == "Điểm đánh giá trung bình theo dòng sản phẩm":
-                    self.truc_quan_hoa.ve_bieu_do_cot(self.xu_ly_du_lieu.diem_danh_gia_trung_binh_theo_dong_SP())
+                    self.truc_quan_hoa.ve_diem_danh_gia_trung_binh_theo_dong_SP(self.xu_ly_du_lieu)
                 elif tab_name == "Số lượng mỗi giới tính theo sản phẩm":
                     self.truc_quan_hoa.ve_bieu_do_so_luong_moi_gioi_tinh_theo_SP(self.xu_ly_du_lieu.du_lieu)
+                elif tab_name == "Doanh thu theo Chi nhánh và Loại khách hàng":
+                    self.truc_quan_hoa.ve_bieu_do_cot_so_sanh(
+                        cot_nhom=['Branch', 'Customer type'],
+                        cot_gia_tri='Total',
+                        title='Doanh thu theo Chi nhánh và Loại khách hàng',
+                        stacked=True
+                    )
+                elif tab_name == "Xu hướng doanh thu theo thời gian của các chi nhánh":
+                    self.truc_quan_hoa.ve_bieu_do_duong_theo_thoi_gian(
+                        cot_thoi_gian='Date',
+                        cot_gia_tri='Total',
+                        cot_nhom='Branch',
+                        title='Xu hướng doanh thu theo thời gian của các chi nhánh'
+                    )
+                elif tab_name == "Phân phối giá bán theo dòng sản phẩm":
+                    self.truc_quan_hoa.ve_bieu_do_box(
+                        cot_gia_tri='Unit price',
+                        cot_nhom='Product line',
+                        title='Phân phối giá bán theo dòng sản phẩm'
+                    )
+                elif tab_name == "Phân phối doanh thu theo phương thức thanh toán":
+                    self.truc_quan_hoa.ve_bieu_do_cot_so_sanh(
+                        cot_gia_tri='Total',
+                        cot_nhom='Payment',
+                        title='Phân phối doanh thu theo phương thức thanh toán'
+                    )
+                elif tab_name == "So sánh doanh thu theo giới tính":
+                    self.truc_quan_hoa.ve_bieu_do_cot_so_sanh(
+                        cot_nhom='Gender',
+                        cot_gia_tri='Total',
+                        title='So sánh doanh thu theo giới tính'
+                    )
+                elif tab_name == "Phân phối điểm đánh giá theo dòng sản phẩm":
+                    self.truc_quan_hoa.ve_bieu_do_phan_phoi(
+                        cot_gia_tri='Rating',
+                        cot_nhom='Product line',
+                        title='Phân phối điểm đánh giá theo dòng sản phẩm'
+                    )
+                elif tab_name == "Số lượng bán ra theo thành phố và dòng sản phẩm":
+                    self.truc_quan_hoa.ve_bieu_do_cot_so_sanh(
+                        cot_nhom=['City', 'Product line'],
+                        cot_gia_tri='Quantity',
+                        title='Số lượng bán ra theo thành phố và dòng sản phẩm',
+                        stacked=True
+                    )
+                
+                
+                    
+                
                
                     
         except Exception as e:
