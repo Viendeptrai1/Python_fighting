@@ -44,4 +44,82 @@ class TrucQuanHoa:
         canvas.get_tk_widget().pack(fill='both', expand=True)
 
     def showinfo(self):
-        return self.du_lieu.info()
+        if self.du_lieu is not None:
+            # Tạo header
+            print("\nAbout this file")
+            print("-" * 80)
+            print("Supermarket sales data")
+            print("-" * 80 + "\n")
+
+            columns_info = {
+                'Invoice ID': {
+                    'desc': 'Computer generated sales slip invoice identification number',
+                    'show_unique': True
+                },
+                'Branch': {
+                    'desc': 'Branch of supercenter (3 branches are available identified by A, B and C)',
+                    'show_dist': True
+                },
+                'City': {
+                    'desc': 'Location of supercenters',
+                    'show_dist': True
+                },
+                'Customer type': {
+                    'desc': 'Type of customers, recorded by Members for customers using member card and Normal for without member card',
+                    'show_dist': True
+                },
+                'Gender': {
+                    'desc': 'Gender type of customer',
+                    'show_dist': True
+                },
+                'Product line': {
+                    'desc': 'General item categorization groups',
+                    'show_dist': True
+                },
+                'Unit price': {
+                    'desc': 'Price of each product in $',
+                    'show_dist': False,
+                    'show_stats': True
+                },
+                'Quantity': {
+                    'desc': 'Number of products purchased by customer',
+                    'show_stats': True
+                },
+                'Tax 5%': {
+                    'desc': '5% tax fee for customer buying',
+                    'show_stats': True
+                },
+                'Total': {
+                    'desc': 'Total price including tax',
+                    'show_stats': True
+                }
+            }
+
+            for col, info in columns_info.items():
+                print(f"\n=> {col}")
+                print(info['desc'])
+                
+                if col in self.du_lieu.columns:
+                    if info.get('show_unique', False):
+                        unique_count = self.du_lieu[col].nunique()
+                        print(f"\n{unique_count:,} unique values")
+                        print("\nExample values:")
+                        print("\n".join(self.du_lieu[col].head(5).astype(str).tolist()))
+
+                    if info.get('show_dist', False):
+                        value_counts = self.du_lieu[col].value_counts()
+                        total = len(self.du_lieu)
+                        print("\nValue distribution:")
+                        for val, count in value_counts.items():
+                            percentage = (count/total) * 100
+                            print(f"{val:<15} {percentage:>6.1f}%")
+                    
+                    if info.get('show_stats', False):
+                        series = self.du_lieu[col]
+                        stats = series.describe()
+                        print(f"\nMin: {stats['min']:.2f}")
+                        print(f"Max: {stats['max']:.2f}")
+                        print(f"Mean: {stats['mean']:.2f}")
+                        print(f"Std: {stats['std']:.2f}")
+
+                    print("\n" + "-" * 80)

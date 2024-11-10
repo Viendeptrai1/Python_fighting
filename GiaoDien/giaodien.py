@@ -1,7 +1,6 @@
 import customtkinter as ctk
 from io import StringIO
 import sys
-import platform
 
 ctk.set_appearance_mode("light")
 
@@ -13,10 +12,10 @@ class ScrollableTabFrame(ctk.CTkFrame):
         
         # Container cho canvas và scrollbar
         self.container = ctk.CTkFrame(self, fg_color="transparent")
-        self.container.pack(fill='x')  # Thay đổi từ 'both' thành 'x'
+        self.container.pack(fill='x')
         
         # Tạo canvas với background phù hợp và chiều cao cố định
-        self.canvas = ctk.CTkCanvas(self.container, bg='#2a2d2e', highlightthickness=0, height=52)  # Chiều cao = button height + 2*padding
+        self.canvas = ctk.CTkCanvas(self.container, bg='#2a2d2e', highlightthickness=0, height=52)
         self.scrollbar = ctk.CTkScrollbar(
             self.container, 
             orientation="horizontal",
@@ -44,36 +43,7 @@ class ScrollableTabFrame(ctk.CTkFrame):
         # Bind các sự kiện
         self.scrollable_frame.bind("<Configure>", self.on_frame_configure)
         self.canvas.bind("<Configure>", self.on_canvas_configure)
-        
-        # Bind sự kiện cuộn chuột
-        self.bind_mouse_scroll()
 
-    # [Giữ nguyên các phương thức khác của ScrollableTabFrame]
-    def bind_mouse_scroll(self):
-        if platform.system() == 'Windows':
-            self.canvas.bind_all("<MouseWheel>", self._on_mousewheel_windows)
-        elif platform.system() == 'Darwin':
-            self.canvas.bind_all("<MouseWheel>", self._on_mousewheel_macos)
-            self.canvas.bind_all("<Option-MouseWheel>", self._on_mousewheel_macos_fast)
-        else:
-            self.canvas.bind_all("<Button-4>", self._on_mousewheel_linux)
-            self.canvas.bind_all("<Button-5>", self._on_mousewheel_linux)
-
-    def _on_mousewheel_windows(self, event):
-        self.canvas.xview_scroll(int(-1 * (event.delta / 120)), "units")
-
-    def _on_mousewheel_macos(self, event):
-        self.canvas.xview_scroll(int(event.delta), "units")
-
-    def _on_mousewheel_macos_fast(self, event):
-        self.canvas.xview_scroll(int(event.delta * 2), "units")
-
-    def _on_mousewheel_linux(self, event):
-        if event.num == 4:
-            self.canvas.xview_scroll(-1, "units")
-        elif event.num == 5:
-            self.canvas.xview_scroll(1, "units")
-        
     def on_frame_configure(self, event):
         bbox = self.canvas.bbox("all")
         if bbox:
@@ -85,6 +55,7 @@ class ScrollableTabFrame(ctk.CTkFrame):
 
 class GiaoDien:
     def __init__(self, master, xu_ly_du_lieu, truc_quan_hoa):
+        
         self.master = master
         master.title("Visual Data - Tab Example")
         self.xu_ly_du_lieu = xu_ly_du_lieu
@@ -103,24 +74,11 @@ class GiaoDien:
         self.label_title.pack(pady=10)
 
         # Frame cuộn chứa các tab với padding phù hợp
-        self.frame_tabs = ScrollableTabFrame(master, fg_color="#2a2d2e")  # Đã loại bỏ height
+        self.frame_tabs = ScrollableTabFrame(master, fg_color="#2a2d2e")
         self.frame_tabs.pack(fill='x', padx=20, pady=(10, 5))
 
         # Các nút tab
         self.tabs = [
-            "Biểu đồ cột", 
-            "Biểu đồ tròn", 
-            "Xem Info dataframe",
-            "Biểu đồ đường",
-            "Biểu đồ scatter",
-            "Biểu đồ box",
-            "Biểu đồ violin",
-            "Biểu đồ heat map",
-            "Biểu đồ bar stack",
-            "Biểu đồ area",
-            "Biểu đồ bubble",
-            "Thống kê mô tả",
-            "Phân tích tương quan",
             "Biểu đồ cột", 
             "Biểu đồ tròn", 
             "Xem Info dataframe",
@@ -151,7 +109,6 @@ class GiaoDien:
             button.grid(row=0, column=idx, padx=6, pady=6)
             self.buttons.append(button)
 
-        # [Giữ nguyên phần còn lại của class GiaoDien]
         # Frame content
         self.frame_content = ctk.CTkFrame(master, fg_color="white")
         self.frame_content.pack(fill='both', expand=True, padx=20, pady=20)
@@ -171,6 +128,14 @@ class GiaoDien:
             wrap="none"
         )
         self.text_info.pack_forget()
+        
+        # Thêm scrollbar ngang
+        self.text_info_x_scrollbar = ctk.CTkScrollbar(
+            self.frame_content,
+            orientation="horizontal",
+            command=self.text_info.xview
+        )
+        self.text_info.configure(xscrollcommand=self.text_info_x_scrollbar.set)
 
     def switch_tab(self, idx):
         tab_name = self.tabs[idx]
@@ -196,6 +161,7 @@ class GiaoDien:
                 info_text = self.capture_output(self.truc_quan_hoa.showinfo)
                 self.text_info.insert("1.0", info_text)
                 self.text_info.configure(state="disabled")
+                
             else:
                 self.text_info.pack_forget()
                 self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
@@ -219,11 +185,3 @@ class GiaoDien:
         func()
         sys.stdout = old_stdout
         return buffer.getvalue()
-
-if __name__ == "__main__":
-    root = ctk.CTk()
-    xu_ly_du_lieu = None
-    truc_quan_hoa = None
-    app = GiaoDien(root, xu_ly_du_lieu, truc_quan_hoa)
-    root.geometry("800x600")
-    root.mainloop()

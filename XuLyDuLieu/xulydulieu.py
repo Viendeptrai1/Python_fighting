@@ -38,4 +38,4 @@ class XuLyDuLieu:
         """
         Chuyển đổi dữ liệu sang định dạng phù hợp.
         """
-      
+    
