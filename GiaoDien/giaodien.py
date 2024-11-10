@@ -1,10 +1,37 @@
 import customtkinter as ctk
+import tkinter as tk
+from tkinter import messagebox, StringVar
+import pandas as pd
 from io import StringIO
 import sys
 import platform
 
+# Cài đặt chế độ giao diện cho customtkinter
 ctk.set_appearance_mode("light")
 
+# Class xử lý dữ liệu từ CSV
+class DataHandler:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.data = self.load_data()
+
+    def load_data(self):
+        """Đọc dữ liệu từ file CSV."""
+        return pd.read_csv(self.file_path)
+
+    def get_invoice_details(self, invoice_id):
+        """Trả về thông tin dựa trên Invoice ID."""
+        entry = self.data[self.data['Invoice ID'] == invoice_id]
+        if not entry.empty:
+            return entry.to_dict(orient='records')[0]
+        else:
+            return None
+
+    def get_all_invoice_ids(self):
+        """Trả về danh sách tất cả Invoice ID có trong dữ liệu."""
+        return self.data['Invoice ID'].unique().tolist()
+
+# Class tạo khung cuộn chứa các tab
 class ScrollableTabFrame(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
         # Loại bỏ height từ kwargs nếu có để tránh xung đột
@@ -83,30 +110,40 @@ class ScrollableTabFrame(ctk.CTkFrame):
         min_width = max(event.width, self.scrollable_frame.winfo_reqwidth())
         self.canvas.itemconfig(self.canvas_frame, width=min_width)
 
+
+
+# Class tạo giao diện chính
 class GiaoDien:
-    def __init__(self, master, xu_ly_du_lieu, truc_quan_hoa):
+    def __init__(self, master):
         self.master = master
-        master.title("Visual Data - Tab Example")
-        self.xu_ly_du_lieu = xu_ly_du_lieu
-        self.truc_quan_hoa = truc_quan_hoa
-
-        # Frame tiêu đề
-        self.frame_header = ctk.CTkFrame(master, fg_color="white")
-        self.frame_header.pack(fill='x')
-
-        self.label_title = ctk.CTkLabel(
-            self.frame_header, 
-            text="Visual Data", 
-            font=("Roboto", 24, "bold"), 
-            text_color="black"
-        )
+        self.master.title("Visual Data - Invoice Lookup")
+        
+        # Tạo đối tượng xử lý dữ liệu và load Invoice IDs
+        self.data_handler = DataHandler('Data/new_data.csv')
+        self.invoice_ids = self.data_handler.get_all_invoice_ids()
+        
+        # Tạo frame tiêu đề và chọn Invoice ID
+        self.label_title = ctk.CTkLabel(master, text="Chọn Invoice ID:", font=("Roboto", 16))
         self.label_title.pack(pady=10)
 
-        # Frame cuộn chứa các tab với padding phù hợp
-        self.frame_tabs = ScrollableTabFrame(master, fg_color="#2a2d2e")  # Đã loại bỏ height
+        self.selected_id = StringVar(master)
+        self.selected_id.set(self.invoice_ids[0])
+
+        self.option_menu = tk.OptionMenu(master, self.selected_id, *self.invoice_ids)
+        self.option_menu.config(font=("Arial", 14))
+        self.option_menu.pack(pady=10)
+
+        self.search_button = ctk.CTkButton(master, text="Tìm kiếm", command=self.show_invoice_details, font=("Roboto", 14))
+        self.search_button.pack(pady=10)
+
+        self.result_label = tk.Label(master, text="", justify='left', font=("Arial", 12))
+        self.result_label.pack(pady=10)
+
+        # Frame cuộn chứa các tab
+        self.frame_tabs = ScrollableTabFrame(master, fg_color="#2a2d2e")
         self.frame_tabs.pack(fill='x', padx=20, pady=(10, 5))
 
-        # Các nút tab
+        # Tạo các button tab
         self.tabs = [
             "Biểu đồ cột", 
             "Biểu đồ tròn", 
@@ -133,11 +170,10 @@ class GiaoDien:
             "Biểu đồ area",
             "Biểu đồ bubble",
             "Thống kê mô tả",
-            "Phân tích tương quan"
-        ]
+            "Phân tích tương quan"]
         self.buttons = []
-        
-        # Tạo các button với padding nhỏ hơn
+
+         # Tạo các button với padding nhỏ hơn
         for idx, tab_name in enumerate(self.tabs):
             button = ctk.CTkButton(
                 self.frame_tabs.scrollable_frame,
@@ -171,59 +207,88 @@ class GiaoDien:
             wrap="none"
         )
         self.text_info.pack_forget()
+        
+    def switch_tab(self, idx):
+     tab_name = self.tabs[idx]
+     
+     for i, button in enumerate(self.buttons):
+         if i == idx:
+             button.configure(
+                 fg_color="#3b8ed0",
+                 hover_color="#2b7cbd"
+             )
+         else:
+             button.configure(
+                 fg_color="#2a2d2e",
+                 hover_color="#404249"
+             )
+     
+     try:
+         if tab_name == "Xem Info dataframe":
+             self.frame_chart.pack_forget()
+             self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
+             self.text_info.configure(state="normal")
+             self.text_info.delete("1.0", "end")
+             info_text = self.capture_output(self.truc_quan_hoa.showinfo)
+             self.text_info.insert("1.0", info_text)
+             self.text_info.configure(state="disabled")
+         else:
+             self.text_info.pack_forget()
+             self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
+             if tab_name == "Biểu đồ cột":
+                 self.truc_quan_hoa.ve_bieu_do_cot("Branch", "Total", self.frame_chart)
+             elif tab_name == "Biểu đồ tròn":
+                 self.truc_quan_hoa.ve_bieu_do_tron("Product line", self.frame_chart)
+         
+     except Exception as e:
+         self.frame_chart.pack_forget()
+         self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
+         self.text_info.configure(state="normal")
+         self.text_info.delete("1.0", "end")
+         self.text_info.insert("1.0", f"Đã xảy ra lỗi: {str(e)}")
+         self.text_info.configure(state="disabled")
+        
+    def capture_output(self, func):
+     buffer = StringIO()
+     old_stdout = sys.stdout
+     sys.stdout = buffer
+     func()
+     sys.stdout = old_stdout
+     return buffer.getvalue()
+    
+
+    def show_invoice_details(self):
+        invoice_id = self.selected_id.get()
+        details = self.data_handler.get_invoice_details(invoice_id)
+
+        if details:
+            result = f"Thông tin cho Invoice ID: {invoice_id}\n"
+            for key, value in details.items():
+                result += f"{key}: {value}\n"
+            self.result_label.config(text=result)
+        else:
+            messagebox.showerror("Không tìm thấy", "Invoice ID không hợp lệ.")
 
     def switch_tab(self, idx):
         tab_name = self.tabs[idx]
-        
         for i, button in enumerate(self.buttons):
-            if i == idx:
-                button.configure(
-                    fg_color="#3b8ed0",
-                    hover_color="#2b7cbd"
-                )
-            else:
-                button.configure(
-                    fg_color="#2a2d2e",
-                    hover_color="#404249"
-                )
-        
-        try:
-            if tab_name == "Xem Info dataframe":
-                self.frame_chart.pack_forget()
-                self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
-                self.text_info.configure(state="normal")
-                self.text_info.delete("1.0", "end")
-                info_text = self.capture_output(self.truc_quan_hoa.showinfo)
-                self.text_info.insert("1.0", info_text)
-                self.text_info.configure(state="disabled")
-            else:
-                self.text_info.pack_forget()
-                self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
-                if tab_name == "Biểu đồ cột":
-                    self.truc_quan_hoa.ve_bieu_do_cot("Branch", "Total", self.frame_chart)
-                elif tab_name == "Biểu đồ tròn":
-                    self.truc_quan_hoa.ve_bieu_do_tron("Product line", self.frame_chart)
-            
-        except Exception as e:
+            button.configure(fg_color="#3b8ed0" if i == idx else "#2a2d2e", hover_color="#2b7cbd" if i == idx else "#404249")
+
+        if tab_name == "Xem Info dataframe":
             self.frame_chart.pack_forget()
             self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
             self.text_info.configure(state="normal")
             self.text_info.delete("1.0", "end")
-            self.text_info.insert("1.0", f"Đã xảy ra lỗi: {str(e)}")
+            self.text_info.insert("1.0", "Thông tin chi tiết của dataframe sẽ hiển thị tại đây.")
             self.text_info.configure(state="disabled")
-
-    def capture_output(self, func):
-        buffer = StringIO()
-        old_stdout = sys.stdout
-        sys.stdout = buffer
-        func()
-        sys.stdout = old_stdout
-        return buffer.getvalue()
+        else:
+            self.text_info.pack_forget()
+            self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
 
 if __name__ == "__main__":
     root = ctk.CTk()
     xu_ly_du_lieu = None
     truc_quan_hoa = None
-    app = GiaoDien(root, xu_ly_du_lieu, truc_quan_hoa)
+    app = GiaoDien(root)
     root.geometry("800x600")
     root.mainloop()
