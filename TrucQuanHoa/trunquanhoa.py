@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import seaborn as sns
-import pandas as pd
 
 class TrucQuanHoa:
     def __init__(self, du_lieu):

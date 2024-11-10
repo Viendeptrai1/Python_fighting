@@ -120,6 +120,19 @@ class GiaoDien:
             "Biểu đồ area",
             "Biểu đồ bubble",
             "Thống kê mô tả",
+            "Phân tích tương quan",
+            "Biểu đồ cột", 
+            "Biểu đồ tròn", 
+            "Xem Info dataframe",
+            "Biểu đồ đường",
+            "Biểu đồ scatter",
+            "Biểu đồ box",
+            "Biểu đồ violin",
+            "Biểu đồ heat map",
+            "Biểu đồ bar stack",
+            "Biểu đồ area",
+            "Biểu đồ bubble",
+            "Thống kê mô tả",
             "Phân tích tương quan"
         ]
         self.buttons = []
