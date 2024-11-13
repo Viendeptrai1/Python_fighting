@@ -73,12 +73,10 @@ class TrucQuanHoa:
         plt.title(title)
         plt.show()
         
-    def ve_bieu_do_heatmap(self, title=None):
+    def ve_bieu_do_heatmap(self, corr_matrix, title=None):
         """
         Vẽ biểu đồ nhiệt (heatmap) cho dữ liệu pivot.
         """ 
-    
-        corr_matrix = self.du_lieu[['age', 'bmi', 'children','charges']].corr()
     
         sns.heatmap(corr_matrix, cmap='Blues', annot=True)
         plt.title(title)

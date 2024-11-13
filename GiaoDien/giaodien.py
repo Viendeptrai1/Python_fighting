@@ -248,6 +248,7 @@ class GiaoDien:
                         title='Chi phí so với vùng theo giới tính'
                     )
                     self.truc_quan_hoa.ve_bieu_do_heatmap(
+                        corr_matrix = self.xu_ly_du_lieu.du_lieu[['age', 'bmi', 'children','charges']].corr(),
                         title='Ma trận tương quan'
                     )
                     
