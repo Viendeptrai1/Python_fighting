@@ -108,21 +108,9 @@ class GiaoDien:
 
         # Các nút tab
         self.tabs = [
-            "Biểu đồ cột", 
-            "Biểu đồ tròn",
-            "Biểu đồ doanh thu trung bình theo loại khách hàng",
-            "Biểu đồ số lượng sản phẩm theo dòng sản phẩm",
-            "Biểu đồ lợi nhuận trung bình theo chi nhánh",
-            "Điểm đánh giá trung bình theo dòng sản phẩm",
-            "Số lượng mỗi giới tính theo sản phẩm",
-            "Xem Info dataframe",
-            "Doanh thu theo Chi nhánh và Loại khách hàng",
-            "Xu hướng doanh thu theo thời gian của các chi nhánh",
-            "Phân phối giá bán theo dòng sản phẩm",
-            "Phân phối doanh thu theo phương thức thanh toán",
-            "So sánh doanh thu theo giới tính",
-            "Phân phối điểm đánh giá theo dòng sản phẩm",
-            "Số lượng bán ra theo thành phố và dòng sản phẩm",
+            "Hình dung về sự phân bố chi phí y tế liên quan đến các yếu tố khác như 'giới tính' và 'khu vực'.",
+            "Hình dung về sự phân bố của các cột 'giới tính', 'khu vực' và 'số lượng con cái'.",
+            "Hình dung về cách cột 'chi phí' liên quan đến các cột khác ('số lượng con cái', 'giới tính', 'khu vực' và 'người hút thuốc')."
         ]
         self.buttons = []
         
@@ -177,75 +165,96 @@ class GiaoDien:
                 )
         
         try:
-            if tab_name == "Xem Info dataframe":
-                self.frame_chart.pack_forget()
-                self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
-                self.text_info.configure(state="normal")
-                self.text_info.delete("1.0", "end")
-                info_text = self.capture_output(self.truc_quan_hoa.showinfo)
-                self.text_info.insert("1.0", info_text)
-                self.text_info.configure(state="disabled")
-            else:
                 self.text_info.pack_forget()
                 self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
-                if tab_name == "Biểu đồ cột":
-                    self.truc_quan_hoa.ve_bieu_do_cot("Branch", "Total", self.frame_chart)
-                elif tab_name == "Biểu đồ tròn":
-                    self.truc_quan_hoa.ve_bieu_do_tron("Product line", self.frame_chart)
-                elif tab_name == "Biểu đồ doanh thu trung bình theo loại khách hàng":
-                    self.truc_quan_hoa.ve_doanh_thu_trung_binh_theo_loai_KH(self.xu_ly_du_lieu)
-                elif tab_name == "Biểu đồ số lượng sản phẩm theo dòng sản phẩm":
-                    self.truc_quan_hoa.ve_so_luong_san_pham_theo_dong_SP(self.xu_ly_du_lieu)
-                elif tab_name == "Biểu đồ lợi nhuận trung bình theo chi nhánh":
-                    self.truc_quan_hoa.ve_loi_nhuan_gop_trung_binh_theo_CN(self.xu_ly_du_lieu)
-                elif tab_name == "Điểm đánh giá trung bình theo dòng sản phẩm":
-                    self.truc_quan_hoa.ve_diem_danh_gia_trung_binh_theo_dong_SP(self.xu_ly_du_lieu)
-                elif tab_name == "Số lượng mỗi giới tính theo sản phẩm":
-                    self.truc_quan_hoa.ve_bieu_do_so_luong_moi_gioi_tinh_theo_SP(self.xu_ly_du_lieu.du_lieu)
-                elif tab_name == "Doanh thu theo Chi nhánh và Loại khách hàng":
-                    self.truc_quan_hoa.ve_bieu_do_cot_so_sanh(
-                        cot_nhom=['Branch', 'Customer type'],
-                        cot_gia_tri='Total',
-                        title='Doanh thu theo Chi nhánh và Loại khách hàng',
-                        stacked=True
-                    )
-                elif tab_name == "Xu hướng doanh thu theo thời gian của các chi nhánh":
-                    self.truc_quan_hoa.ve_bieu_do_duong_theo_thoi_gian(
-                        cot_thoi_gian='Date',
-                        cot_gia_tri='Total',
-                        cot_nhom='Branch',
-                        title='Xu hướng doanh thu theo thời gian của các chi nhánh'
-                    )
-                elif tab_name == "Phân phối giá bán theo dòng sản phẩm":
-                    self.truc_quan_hoa.ve_bieu_do_box(
-                        cot_gia_tri='Unit price',
-                        cot_nhom='Product line',
-                        title='Phân phối giá bán theo dòng sản phẩm'
-                    )
-                elif tab_name == "Phân phối doanh thu theo phương thức thanh toán":
-                    self.truc_quan_hoa.ve_bieu_do_cot_so_sanh(
-                        cot_gia_tri='Total',
-                        cot_nhom='Payment',
-                        title='Phân phối doanh thu theo phương thức thanh toán'
-                    )
-                elif tab_name == "So sánh doanh thu theo giới tính":
-                    self.truc_quan_hoa.ve_bieu_do_cot_so_sanh(
-                        cot_nhom='Gender',
-                        cot_gia_tri='Total',
-                        title='So sánh doanh thu theo giới tính'
-                    )
-                elif tab_name == "Phân phối điểm đánh giá theo dòng sản phẩm":
-                    self.truc_quan_hoa.ve_bieu_do_phan_phoi(
-                        cot_gia_tri='Rating',
-                        cot_nhom='Product line',
-                        title='Phân phối điểm đánh giá theo dòng sản phẩm'
-                    )
-                elif tab_name == "Số lượng bán ra theo thành phố và dòng sản phẩm":
+                if tab_name == "Hình dung về sự phân bố chi phí y tế liên quan đến các yếu tố khác như 'giới tính' và 'khu vực'.":
                     self.truc_quan_hoa.ve_bieu_do_histogram(
-                        cot_gia_tri = 'age',  
-                        so_khoang = 47, 
-                        title = 'Distribution of Age'
+                        cot_gia_tri='age',
+                        bien='box',
+                        so_khoang=47, 
+                        title='Phân bố tuổi'
                     )
+                    self.truc_quan_hoa.ve_bieu_do_histogram(
+                        cot_gia_tri='bmi',
+                        bien='box',
+                        mau_cu_the = ['red'],
+                        title='Phân bố BMI(Body Mass Index)'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_histogram(
+                        cot_gia_tri='charges',
+                        bien='box',
+                        mau_phan_loai = 'smoker',
+                        mau_cu_the = ['red','grey'],
+                        title='Phí y tế hàng năm'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_histogram(
+                        cot_gia_tri='charges',
+                        mau_phan_loai = 'sex',
+                        mau_cu_the = ['blue','red'],
+                        title='Các khoản phí khác nhau về giới tính'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_histogram(
+                        cot_gia_tri='charges',
+                        bien='box',
+                        mau_phan_loai = 'region',
+                        title='Chi phí trên các khu vực khác nhau của Hoa Kỳ'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_histogram(
+                        cot_gia_tri='smoker',
+                        mau_phan_loai = 'sex',
+                        title='Số lượng hút thuốc và không hút thuốc theo nam và nữ'
+                    )
+                elif tab_name == "Hình dung về sự phân bố của các cột 'giới tính', 'khu vực' và 'số lượng con cái'.":
+                    self.truc_quan_hoa.ve_bieu_do_histogram(
+                        cot_gia_tri='charges',
+                        bien='box',
+                        mau_phan_loai = 'children',
+                        title='Chi phí phát sinh cho trẻ em'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_scatter(
+                        cot_gia_tri='age',
+                        cot_nhom='charges',
+                        mau_phan_loai='smoker',
+                        do_mo=0.8,
+                        du_lieu_them=['sex'],
+                        title='Chi phí so với độ tuổi'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_scatter(
+                        cot_gia_tri='bmi',
+                        cot_nhom='charges',
+                        mau_phan_loai='smoker',
+                        do_mo=0.8,
+                        du_lieu_them=['sex'],
+                        title='Chi phí so với BMI'
+                    )
+                elif tab_name == "Hình dung về cách cột 'chi phí' liên quan đến các cột khác ('số lượng con cái', 'giới tính', 'khu vực' và 'người hút thuốc').":
+                    self.truc_quan_hoa.ve_bieu_do_violin(
+                        cot_gia_tri='children',
+                        cot_nhom='charges',
+                        title='Chi phí so với số lượng con cái'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_barplot(
+                        cot_gia_tri='sex',
+                        cot_nhom='charges',
+                        du_lieu_phan_biet='smoker',
+                        title='Chi phí so với việc hút thuốc hay không hút thuốc theo giới tính'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_histogram(
+                        cot_gia_tri='sex',
+                        cot_nhom='charges',
+                        mau_phan_loai='region',
+                        nhan_x='Tổng chi phí',
+                        nhan_y='Giới tính',
+                        title='Chi phí so với vùng theo giới tính'
+                    )
+                    self.truc_quan_hoa.ve_bieu_do_heatmap(
+                        title='Ma trận tương quan'
+                    )
+                    
+                    
+                
+                    
+                
                 
                 
                     
