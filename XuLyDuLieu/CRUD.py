@@ -1,80 +1,127 @@
-﻿import pandas as pd  
+﻿﻿import pandas as pd
+import numpy as np
 
-class DataHandler:  
-    def __init__(self, file_path):  
-        self.file_path = file_path  
-        self.data = self.load_data()  
+df = pd.read_csv("data\Health_insurance.csv")
+def add_new_record():
+    """Thêm một bản ghi mới vào DataFrame"""
+    global df
+    print("\n=== Thêm bản ghi mới ===")
+    new_record = {}
+    new_record['age'] = int(input("Nhập tuổi: "))
+    new_record['sex'] = input("Nhập giới tính (male/female): ")
+    new_record['bmi'] = float(input("Nhập BMI: "))
+    new_record['children'] = int(input("Nhập số con: "))
+    new_record['smoker'] = input("Nhập tình trạng hút thuốc (yes/no): ")
+    new_record['region'] = input("Nhập khu vực (southwest/southeast/northwest/northeast): ")
+    new_record['charges'] = float(input("Nhập chi phí: "))
+    
+    df = df.append(new_record, ignore_index=True)
+    return "Đã thêm bản ghi mới thành công!"
 
-    def load_data(self):  
-        """Đọc dữ liệu từ file CSV."""  
-        return pd.read_csv(self.file_path)  
+def update_record():
+    """Cập nhật một giá trị trong DataFrame"""
+    global df
+    print("\n=== Cập nhật bản ghi ===")
+    print("Dữ liệu hiện tại:")
+    print(df)
+    index = int(input("\nNhập index cần cập nhật: "))
+    column = input("Nhập tên cột cần cập nhật: ")
+    new_value = input("Nhập giá trị mới: ")
+    
+    # Chuyển đổi kiểu dữ liệu phù hợp
+    if column in ['age', 'children']:
+        new_value = int(new_value)
+    elif column in ['bmi', 'charges']:
+        new_value = float(new_value)
+    
+    df.at[index, column] = new_value
+    return f"Đã cập nhật {column} tại index {index} thành {new_value}"
 
-    def create_entry(self, new_data):  
-        """Thêm một hàng dữ liệu mới."""  
-        new_df = pd.DataFrame([new_data])  # Chuyển đổi new_data thành DataFrame  
-        self.data = pd.concat([self.data, new_df], ignore_index=True)  # Kết hợp với dữ liệu hiện tại  
+def delete_records():
+    """Xóa các bản ghi theo index"""
+    global df
+    print("\n=== Xóa bản ghi ===")
+    print("Dữ liệu hiện tại:")
+    print(df)
+    index = int(input("\nNhập index cần xóa: "))
+    df = df.drop(index)
+    return "Đã xóa bản ghi thành công!"
 
-    def read_data(self):  
-        """Đọc và hiển thị dữ liệu."""  
-        return self.data  
+def sort_data():
+    """Sắp xếp DataFrame theo cột được chọn"""
+    global df
+    print("\n=== Sắp xếp dữ liệu ===")
+    column = input("Nhập tên cột cần sắp xếp: ")
+    order = input("Sắp xếp tăng dần? (yes/no): ")
+    df = df.sort_values(by=column, ascending=(order.lower() == 'yes'))
+    return "Đã sắp xếp dữ liệu thành công!"
 
-    def update_entry(self, invoice_id, updates):  
-        """Cập nhật thông tin cho một hàng theo Invoice ID."""  
-        for key, value in updates.items():  
-            self.data.loc[self.data['Invoice ID'] == invoice_id, key] = value  
+def search_data():
+    """Tìm kiếm dữ liệu theo cột và giá trị"""
+    print("\n=== Tìm kiếm dữ liệu ===")
+    column = input("Nhập tên cột cần tìm kiếm: ")
+    value = input("Nhập giá trị cần tìm: ")
+    
+    # Chuyển đổi kiểu dữ liệu phù hợp
+    if column in ['age', 'children']:
+        value = int(value)
+    elif column in ['bmi', 'charges']:
+        value = float(value)
+    
+    result = df[df[column] == value]
+    print("\nKết quả tìm kiếm:")
+    print(result)
 
-    def delete_entry(self, invoice_id):  
-        """Xóa một hàng theo Invoice ID."""  
-        self.data = self.data[self.data['Invoice ID'] != invoice_id]  
+def show_statistics():
+    """Hiển thị thống kê cơ bản"""
+    print("\n=== Thống kê cơ bản ===")
+    print("\nThống kê mô tả:")
+    print(df.describe())
+    print("\nChi phí trung bình theo khu vực:")
+    print(df.groupby('region')['charges'].mean())
 
-    def clean_data(self):  
-        """Làm sạch dữ liệu (thay đổi theo yêu cầu cụ thể)."""  
-        self.data.dropna(inplace=True)  # Ví dụ: xóa hàng có giá trị thiếu  
+def display_data():
+    """Hiển thị toàn bộ dữ liệu"""
+    print("\n=== Dữ liệu hiện tại ===")
+    print(df)
 
-    def save_data(self, output_path):  
-        """Lưu dữ liệu vào file mới."""  
-        self.data.to_csv(output_path, index=False)
+def main():
+    while True:
+        print("\n=== MENU QUẢN LÝ DỮ LIỆU BẢO HIỂM ===")
+        print("1. Hiển thị dữ liệu")
+        print("2. Thêm bản ghi mới")
+        print("3. Cập nhật bản ghi")
+        print("4. Xóa bản ghi")
+        print("5. Sắp xếp dữ liệu")
+        print("6. Tìm kiếm dữ liệu")
+        print("7. Xem thống kê")
+        print("0. Thoát")
+        
+        choice = input("\nNhập lựa chọn của bạn: ")
+        
+        try:
+            if choice == '1':
+                display_data()
+            elif choice == '2':
+                print(add_new_record())
+            elif choice == '3':
+                print(update_record())
+            elif choice == '4':
+                print(delete_records())
+            elif choice == '5':
+                print(sort_data())
+            elif choice == '6':
+                search_data()
+            elif choice == '7':
+                show_statistics()
+            elif choice == '0':
+                print("Cảm ơn bạn đã sử dụng chương trình!")
+                break
+            else:
+                print("Lựa chọn không hợp lệ!")
+        except Exception as e:
+            print(f"Có lỗi xảy ra: {str(e)}")
+            print("Vui lòng thử lại!")
 
-# Ví dụ sử dụng  
-if __name__ == "__main__":  
-    file_path = 'Data/data_sales.csv'    
-    output_path = 'Data/new_data.csv'    
-
-    handler = DataHandler(file_path)  
-
-    # Thêm dữ liệu mới  
-    new_data = {  
-        'Invoice ID': '999-99-9999',  
-        'Branch': 'A',  
-        'City': 'Yangon',  
-        'Customer type': 'Member',  
-        'Gender': 'Female',  
-        'Product line': 'Health and beauty',  
-        'Unit price': 55.00,  
-        'Quantity': 5,  
-        'Tax 5%': 2.75,  
-        'Total': 282.75,  
-        'Date': '3/10/2019',  
-        'Time': '10:30',  
-        'Payment': 'Cash',  
-        'cogs': 275.00,  
-        'gross margin percentage': 4.761904762,  
-        'gross income': 7.75,  
-        'Rating': 9.0  
-    }  
-    handler.create_entry(new_data)  
-
-    # Đọc và hiển thị dữ liệu  
-    print(handler.read_data())  
-
-    # Cập nhật thông tin  
-    handler.update_entry('999-99-9999', {'Quantity': 6, 'Total': 330.00})  
-
-    # Xóa dữ liệu  
-    handler.delete_entry('999-99-9999')  
-
-    # Làm sạch dữ liệu  
-    handler.clean_data()  
-
-    # Lưu dữ liệu sạch vào file mới  
-    handler.save_data(output_path)
+if __name__ == "__main__":
+    main()
