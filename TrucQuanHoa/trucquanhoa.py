@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import plotly.express as px
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -67,6 +68,19 @@ class TrucQuanHoa:
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.tight_layout()
         plt.show()
+        
+    def ve_bieu_do_histogram(self, cot_gia_tri, so_khoang = None, title=None,  figsize=(12, 6)):
+        """
+        Vẽ biểu đồ histogram cho một biến số.
+        """
+        fig = px.histogram(self.du_lieu, 
+                   x = cot_gia_tri, 
+                   marginal='box', 
+                   nbins= so_khoang or 30,
+                   color_discrete_sequence = self.colors,
+                   title = title or f'Histogram của {cot_gia_tri}')
+        fig.update_layout(bargap=0.1)
+        fig.show()
 
     def ve_bieu_do_scatter_matrix(self, danh_sach_cot, figsize=(12, 12)):
         """
@@ -119,135 +133,6 @@ class TrucQuanHoa:
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.tight_layout()
         plt.show()
-
-    
-    def ve_bieu_do_duong_theo_thoi_gian(self, cot_thoi_gian, cot_gia_tri, 
-                                       cot_nhom=None, title=None, figsize=(12, 6)):
-        """
-        Vẽ biểu đồ đường theo thời gian, có thể phân tách theo nhóm.
-        """
-        plt.figure(figsize=figsize)
-        try:
-            if cot_nhom:
-                for name, group in self.du_lieu.groupby(cot_nhom):
-                    plt.plot(group[cot_thoi_gian], group[cot_gia_tri], 
-                            label=name, marker='o', linestyle='-')
-                plt.legend(title=cot_nhom)
-            else:
-                plt.plot(self.du_lieu[cot_thoi_gian], self.du_lieu[cot_gia_tri], 
-                        marker='o', linestyle='-')
-            
-            plt.title(title or f'Biểu đồ xu hướng {cot_gia_tri} theo thời gian')
-            plt.xlabel(cot_thoi_gian)
-            plt.ylabel(cot_gia_tri)
-            plt.grid(True, linestyle='--', alpha=0.7)
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-            plt.show()
-        except Exception as e:
-            print(f"Lỗi khi vẽ biểu đồ đường: {str(e)}")
-
-    def ve_dashboard_tong_quan(self, figsize=(15, 10)):
-        """
-        Vẽ dashboard tổng quan với nhiều biểu đồ khác nhau.
-        """
-        try:
-            fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=figsize)
-            
-            # Biểu đồ 1: Doanh thu theo loại khách hàng
-            self.du_lieu.groupby('Customer type')['Total'].mean().plot(
-                kind='bar', ax=ax1, color=self.colors[0])
-            ax1.set_title('Doanh thu trung bình theo loại KH')
-            ax1.set_ylabel('Doanh thu')
-            
-            # Biểu đồ 2: Số lượng theo dòng sản phẩm
-            self.du_lieu.groupby('Product line')['Quantity'].sum().plot(
-                kind='bar', ax=ax2, color=self.colors[1])
-            ax2.set_title('Số lượng bán theo dòng SP')
-            ax2.tick_params(axis='x', rotation=45)
-            
-            # Biểu đồ 3: Phân bố điểm đánh giá
-            sns.boxplot(x='Branch', y='Rating', data=self.du_lieu, ax=ax3, color=self.colors[2])
-            ax3.set_title('Phân bố điểm đánh giá theo chi nhánh')
-            
-            # Biểu đồ 4: Tỷ lệ thanh toán
-            payment_data = self.du_lieu['Payment'].value_counts()
-            ax4.pie(payment_data, labels=payment_data.index, autopct='%1.1f%%', colors=self.colors)
-            ax4.set_title('Tỷ lệ phương thức thanh toán')
-            
-            plt.tight_layout()
-            plt.show()
-        except Exception as e:
-            print(f"Lỗi khi vẽ dashboard: {str(e)}")
-
-    def luu_bieu_do(self, filename, dpi=300):
-        """
-        Lưu biểu đồ hiện tại thành file ảnh.
-        """
-        try:
-            plt.savefig(filename, dpi=dpi, bbox_inches='tight')
-        except Exception as e:
-            print(f"Lỗi khi lưu biểu đồ: {str(e)}")
-
-
-
-
-
-    def ve_bieu_do_cot(self, ten_cot_x, ten_cot_y):
-        """
-        Vẽ biểu đồ cột.
-        """
-        plt.figure(figsize=(10, 6))
-        plt.bar(self.du_lieu[ten_cot_x], self.du_lieu[ten_cot_y], color='skyblue')
-        plt.xlabel(ten_cot_x)
-        plt.ylabel(ten_cot_y)
-        plt.title(f'Biểu đồ cột của {ten_cot_y} theo {ten_cot_x}')
-        plt.xticks(rotation=45)
-        plt.show()
-
-    def ve_bieu_do_tron(self, cot_danh_muc):
-        """
-        Vẽ biểu đồ tròn cho phân phối của một cột danh mục.
-        """
-        plt.figure(figsize=(8, 8))
-        self.du_lieu[cot_danh_muc].value_counts().plot.pie(autopct='%1.1f%%', startangle=140)
-        plt.title(f'Biểu đồ tròn của {cot_danh_muc}')
-        plt.ylabel('')
-        plt.show()
         
-    
-    def ve_doanh_thu_trung_binh_theo_loai_KH(self, xu_ly_du_lieu):
-        plt.figure(figsize=(8, 6))
-        xu_ly_du_lieu.doanh_thu_trung_binh_theo_loai_KH().plot(kind = "bar", color = "blue", edgecolor = "black")    
-        plt.xticks(rotation = 0)
-        plt.show()
-    
-    def ve_so_luong_san_pham_theo_dong_SP(self, xu_ly_du_lieu):
-        plt.figure(figsize=(8, 6))
-        xu_ly_du_lieu.so_luong_san_pham_theo_dong_SP().plot(kind = "bar", color = "blue", edgecolor = "black")    
-        plt.xticks(rotation = 0)
-        plt.show()
-        
-    def ve_loi_nhuan_gop_trung_binh_theo_CN(self, xu_ly_du_lieu):
-        plt.figure(figsize=(8, 6))
-        xu_ly_du_lieu.loi_nhuan_gop_trung_binh_theo_CN().plot(kind = "bar", color = "blue", edgecolor = "black")    
-        plt.xticks(rotation = 0)
-        plt.show()
-        
-    def ve_diem_danh_gia_trung_binh_theo_dong_SP(self, xu_ly_du_lieu):
-        plt.figure(figsize=(8, 6))
-        xu_ly_du_lieu.diem_danh_gia_trung_binh_theo_dong_SP().plot(kind = "bar", color = "blue", edgecolor = "black")    
-        plt.xticks(rotation = 0)
-        plt.show()
-        
-    
-    def ve_bieu_do_so_luong_moi_gioi_tinh_theo_SP(self, df):
-        plt.figure(figsize=(12, 6))
-        sns.countplot(x='Product line', hue='Gender', data = df)
-        plt.title('Number of Each Gender by Product line')
-        plt.xlabel('Product line')
-        plt.ylabel('Count')
-        plt.legend(title='Gender')
-        plt.show()
 
     

@@ -241,11 +241,10 @@ class GiaoDien:
                         title='Phân phối điểm đánh giá theo dòng sản phẩm'
                     )
                 elif tab_name == "Số lượng bán ra theo thành phố và dòng sản phẩm":
-                    self.truc_quan_hoa.ve_bieu_do_cot_so_sanh(
-                        cot_nhom=['City', 'Product line'],
-                        cot_gia_tri='Quantity',
-                        title='Số lượng bán ra theo thành phố và dòng sản phẩm',
-                        stacked=True
+                    self.truc_quan_hoa.ve_bieu_do_histogram(
+                        cot_gia_tri = 'age',  
+                        so_khoang = 47, 
+                        title = 'Distribution of Age'
                     )
                 
                 
