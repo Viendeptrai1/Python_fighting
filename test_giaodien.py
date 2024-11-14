@@ -5,12 +5,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 from DocDuLieu.docdulieu import *
-class InsuranceApp:
+class GiaoDien:
     def __init__(self):
         st.set_page_config(page_title="Dự đoán giá bảo hiểm y tế", layout="wide")
-        if 'data' not in st.session_state:
-            # Tạo dữ liệu mẫu
-            st.session_state.data = DuLieu("/Users/kotori/Documents/Code/python_code/tryagain/Python_fighting/Data/Health_insurance.csv").lay_du_lieu()
+        
+        st.session_state.data = DuLieu("/Users/kotori/Documents/Code/python_code/tryagain/Python_fighting/Data/Health_insurance.csv").lay_du_lieu()
 
     def main(self):
         st.title("Dự đoán giá bảo hiểm y tế")
@@ -27,45 +26,7 @@ class InsuranceApp:
             self.show_create_form()
         else:
             self.show_charts()
-
-    # def show_data_list(self):
-    #     st.header("Data List")
-        
-    #     # Search and Filter
-    #     col1, col2, col3 = st.columns(3)
-    #     with col1:
-    #         search = st.text_input("Search...")
-    #     with col2:
-    #         filter_column = st.selectbox("Filter Column", st.session_state.data.columns)
-    #     with col3:
-    #         sort_column = st.selectbox("Sort By", st.session_state.data.columns)
-        
-    #     # Apply filters
-    #     df = st.session_state.data.copy()
-    #     if search:
-    #         mask = df.astype(str).apply(lambda x: x.str.contains(search, case=False)).any(axis=1)
-    #         df = df[mask]
-        
-    #     # Sort
-    #     df = df.sort_values(by=sort_column)
-        
-    #     # Display data with pagination
-    #     items_per_page = 10
-    #     total_pages = len(df) // items_per_page + (1 if len(df) % items_per_page > 0 else 0)
-        
-    #     col1, col2, col3 = st.columns([1, 3, 1])
-    #     with col2:
-    #         page = st.slider('Page', 1, max(1, total_pages), 1)
-        
-    #     start_idx = (page - 1) * items_per_page
-    #     end_idx = min(start_idx + items_per_page, len(df))
-        
-    #     # Display data
-    #     st.dataframe(df.iloc[start_idx:end_idx], use_container_width=True)
-        
-    #     # Delete functionality
-    #     if st.button("Delete Selected"):
-    #         st.warning("Delete functionality would go here")
+            
     def show_data_list(self):
         st.header("Data List")
 
@@ -243,5 +204,5 @@ class InsuranceApp:
         st.plotly_chart(fig, use_container_width=True)
 
 if __name__ == "__main__":
-    app = InsuranceApp()
+    app = GiaoDien()
     app.main()
