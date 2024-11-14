@@ -7,7 +7,7 @@ class GiaoDien:
         st.set_page_config(page_title="Dự đoán giá bảo hiểm y tế", layout="wide")
 
     def main(self):
-        st.title("Dự đoán giá bảo hiểm y tế")
+        st.write(f'<h1 style="text-align:center;">Dự đoán giá bảo hiểm y tế</h1>', unsafe_allow_html=True)
         
         # Sidebar menu
         menu = st.sidebar.selectbox("Menu", ["Data List", "CRUD", "Charts"])
