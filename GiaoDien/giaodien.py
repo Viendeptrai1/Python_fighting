@@ -21,30 +21,6 @@ class GiaoDien:
         else:
             self.show_charts()
 
-    # def show_data_list(self):
-    #     st.header("Data List")
-
-    #     col1, col2, col3, col4 = st.columns(4)
-    #     with col1:
-    #         search = st.text_input("Search...")
-    #     with col2:
-    #         filter_column = st.selectbox("Filter Column", [""] + list(st.session_state.data.columns))
-    #     with col3:
-    #         if filter_column:
-    #             filter_operator = st.selectbox("Filter Operator", ["equals", "greater than", "less than"])
-    #     with col4:
-    #         if filter_column:
-    #             filter_value = st.number_input("Filter Value", step=1.0)
-
-    #     df = st.session_state.data.copy()
-    #     if search:
-    #         mask = df.astype(str).apply(lambda x: x.str.contains(search, case=False)).any(axis=1)
-    #         df = df[mask]
-
-    #     if filter_column and filter_operator and filter_value:
-    #         df = st.session_state.xu_ly.loc_du_lieu(filter_column, filter_value, filter_operator)
-
-    #     st.dataframe(df)
     def show_data_list(self):
         st.header("Data List")
 
