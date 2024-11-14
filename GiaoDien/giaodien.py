@@ -35,7 +35,8 @@ class GiaoDien:
         # Search, Filter, and Sort functionality
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            search = st.text_input("Search...")
+            # search = st.text_input("Search...")
+            search = st.text_input("Search... ")
         with col2:
             filter_column = st.selectbox("Filter Column", [""] + list(data.columns))
         with col3:
@@ -43,11 +44,9 @@ class GiaoDien:
         with col4:
             filter_value = st.text_input("Filter Value") if filter_operator == "contains" else st.number_input("Filter Value", step=1.0) if filter_operator else ""
 
-        # Apply search and filter
-        if search:
-            mask = data.astype(str).apply(lambda x: x.str.contains(search, case=False)).any(axis=1)
-            data = data[mask]
         
+        if search:
+            data = data[data.apply(lambda row: row.astype(str).str.contains(search, case=False, na=False).any(), axis=1)]
         if filter_column and filter_operator and filter_value:
             if filter_operator == "contains":
                 data = data[data[filter_column].astype(str).str.contains(filter_value, case=False)]
@@ -104,73 +103,86 @@ class GiaoDien:
             st.dataframe(data.iloc[start_idx:end_idx], use_container_width=True)
 
 
-
     def show_create_form(self):
-        st.header("Create/Update/Delete Data")
-        df = st.session_state.modified_data
-        
-        # Chọn giữa tạo mới và cập nhật
-        operation = st.radio("Choose Operation", ["Create New", "Update Existing"])
-        
-        with st.form("create_form"):
-            if operation == "Update Existing":
-                index = st.selectbox("Select Record to Update/Delete", range(len(df)),
-                                     format_func=lambda x: f"Record {x}: Age {df.iloc[x]['age']}, Region {df.iloc[x]['region']}")
-                current_record = df.iloc[index]
-                age = st.number_input("Age", min_value=0, max_value=100, value=int(current_record['age']))
-                sex = st.selectbox("Sex", ["male", "female"], index=0 if current_record['sex'] == 'male' else 1)
-                bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=float(current_record['bmi']))
-                children = st.number_input("Number of Children", min_value=0, max_value=10, value=int(current_record['children']))
-                smoker = st.selectbox("Smoker", ["yes", "no"], index=0 if current_record['smoker'] == 'yes' else 1)
-                region = st.selectbox("Region", ["southeast", "southwest", "northeast", "northwest"], 
-                                      index=["southeast", "southwest", "northeast", "northwest"].index(current_record['region']))
+            st.header("Create/Update/Delete Data")
+            df = st.session_state.modified_data
+            
+            # Chọn giữa tạo mới và cập nhật
+            operation = st.radio("Choose Operation", ["Create New", "Update Existing", "Delete Multiple"])
+            
+            if operation == "Delete Multiple":
+                # Checkbox for selecting multiple rows to delete
+                st.write("Select rows to delete:")
+                selected_indices = st.multiselect(
+                    "Choose rows", options=df.index, 
+                    format_func=lambda x: f"Record {x}: Age {df.iloc[x]['age']}, Region {df.iloc[x]['region']}"
+                )
+                
+                # Button to confirm deletion
+                if st.button("Delete Selected Rows") and selected_indices:
+                    st.session_state.modified_data = df.drop(index=selected_indices).reset_index(drop=True)
+                    st.session_state.modified_changes = st.session_state.modified_changes.drop(index=selected_indices).reset_index(drop=True)
+                    st.success(f"Deleted {len(selected_indices)} selected records.")
+            
             else:
-                # Tạo mới với giá trị mặc định
-                age = st.number_input("Age", min_value=0, max_value=100, value=30)
-                sex = st.selectbox("Sex", ["male", "female"])
-                bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=25.0)
-                children = st.number_input("Number of Children", min_value=0, max_value=10, value=0)
-                smoker = st.selectbox("Smoker", ["yes", "no"])
-                region = st.selectbox("Region", ["southeast", "southwest", "northeast", "northwest"])
+                with st.form("create_form"):
+                    if operation == "Update Existing":
+                        index = st.selectbox("Select Record to Update/Delete", range(len(df)),
+                                            format_func=lambda x: f"Record {x}: Age {df.iloc[x]['age']}, Region {df.iloc[x]['region']}")
+                        current_record = df.iloc[index]
+                        age = st.number_input("Age", min_value=0, max_value=100, value=int(current_record['age']))
+                        sex = st.selectbox("Sex", ["male", "female"], index=0 if current_record['sex'] == 'male' else 1)
+                        bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=float(current_record['bmi']))
+                        children = st.number_input("Number of Children", min_value=0, max_value=10, value=int(current_record['children']))
+                        smoker = st.selectbox("Smoker", ["yes", "no"], index=0 if current_record['smoker'] == 'yes' else 1)
+                        region = st.selectbox("Region", ["southeast", "southwest", "northeast", "northwest"], 
+                                            index=["southeast", "southwest", "northeast", "northwest"].index(current_record['region']))
+                    else:
+                        # Tạo mới với giá trị mặc định
+                        age = st.number_input("Age", min_value=0, max_value=100, value=30)
+                        sex = st.selectbox("Sex", ["male", "female"])
+                        bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=25.0)
+                        children = st.number_input("Number of Children", min_value=0, max_value=10, value=0)
+                        smoker = st.selectbox("Smoker", ["yes", "no"])
+                        region = st.selectbox("Region", ["southeast", "southwest", "northeast", "northwest"])
 
-            # Nút lưu hoặc xóa bản ghi
-            submitted = st.form_submit_button("Save")
-            delete_submitted = st.form_submit_button("Delete") if operation == "Update Existing" else None
-        
-        if submitted:
-            if operation == "Create New":
-                new_data = {
-                    'age': age,
-                    'sex': sex,
-                    'bmi': bmi,
-                    'children': children,
-                    'smoker': smoker,
-                    'region': region,
-                    'charges': float(np.random.uniform(5000, 50000))
-                }
-                st.session_state.modified_data = pd.concat([st.session_state.modified_data, pd.DataFrame([new_data])], ignore_index=True)
-                st.session_state.modified_changes.loc[len(st.session_state.modified_data) - 1] = True
-                st.success("New record created successfully!")
-            else:
-                fields = {
-                    'age': age,
-                    'sex': sex,
-                    'bmi': bmi,
-                    'children': children,
-                    'smoker': smoker,
-                    'region': region
-                }
-                for column, value in fields.items():
-                    original_value = st.session_state.original_data.at[index, column]
-                    st.session_state.modified_data.at[index, column] = value
-                    st.session_state.modified_changes.at[index, column] = (original_value != value)
-                st.success("Record updated successfully!")
-        
-        if delete_submitted:
-            st.session_state.modified_data = st.session_state.modified_data.drop(index).reset_index(drop=True)
-            st.session_state.modified_changes = st.session_state.modified_changes.drop(index).reset_index(drop=True)
-            st.success("Record deleted successfully!")
-
+                    # Nút lưu hoặc xóa bản ghi
+                    submitted = st.form_submit_button("Save")
+                    delete_submitted = st.form_submit_button("Delete") if operation == "Update Existing" else None
+                
+                if submitted:
+                    if operation == "Create New":
+                        new_data = {
+                            'age': age,
+                            'sex': sex,
+                            'bmi': bmi,
+                            'children': children,
+                            'smoker': smoker,
+                            'region': region,
+                            'charges': float(np.random.uniform(5000, 50000))
+                        }
+                        st.session_state.modified_data = pd.concat([st.session_state.modified_data, pd.DataFrame([new_data])], ignore_index=True)
+                        st.session_state.modified_changes.loc[len(st.session_state.modified_data) - 1] = True
+                        st.success("New record created successfully!")
+                    else:
+                        fields = {
+                            'age': age,
+                            'sex': sex,
+                            'bmi': bmi,
+                            'children': children,
+                            'smoker': smoker,
+                            'region': region
+                        }
+                        for column, value in fields.items():
+                            original_value = st.session_state.original_data.at[index, column]
+                            st.session_state.modified_data.at[index, column] = value
+                            st.session_state.modified_changes.at[index, column] = (original_value != value)
+                        st.success("Record updated successfully!")
+                
+                if delete_submitted:
+                    st.session_state.modified_data = st.session_state.modified_data.drop(index).reset_index(drop=True)
+                    st.session_state.modified_changes = st.session_state.modified_changes.drop(index).reset_index(drop=True)
+                    st.success("Record deleted successfully!")
 
 
     def show_charts(self):
