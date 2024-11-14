@@ -84,11 +84,13 @@ class ScrollableTabFrame(ctk.CTkFrame):
         self.canvas.itemconfig(self.canvas_frame, width=min_width)
 
 class GiaoDien:
-    def __init__(self, master, xu_ly_du_lieu, truc_quan_hoa):
+    def __init__(self, master, xu_ly_du_lieu, truc_quan_hoa, phan_tich_va_du_doan, du_lieu):
         self.master = master
         master.title("Visual Data - Tab Example")
         self.xu_ly_du_lieu = xu_ly_du_lieu
         self.truc_quan_hoa = truc_quan_hoa
+        self.phan_tich_va_du_doan = phan_tich_va_du_doan
+        self.du_lieu = du_lieu
 
         # Frame tiêu đề
         self.frame_header = ctk.CTkFrame(master, fg_color="white")
@@ -110,7 +112,8 @@ class GiaoDien:
         self.tabs = [
             "Hình dung về sự phân bố chi phí y tế liên quan đến các yếu tố khác như 'giới tính' và 'khu vực'.",
             "Hình dung về sự phân bố của các cột 'giới tính', 'khu vực' và 'số lượng con cái'.",
-            "Hình dung về cách cột 'chi phí' liên quan đến các cột khác ('số lượng con cái', 'giới tính', 'khu vực' và 'người hút thuốc')."
+            "Hình dung về cách cột 'chi phí' liên quan đến các cột khác ('số lượng con cái', 'giới tính', 'khu vực' và 'người hút thuốc').",
+            "Hồi quy tuyến tính sử dụng một tính năng duy nhất dựa trên tuổi"
         ]
         self.buttons = []
         
@@ -248,11 +251,11 @@ class GiaoDien:
                         title='Chi phí so với vùng theo giới tính'
                     )
                     self.truc_quan_hoa.ve_bieu_do_heatmap(
-                        corr_matrix = self.xu_ly_du_lieu.du_lieu[['age', 'bmi', 'children','charges']].corr(),
+                        corr_matrix = self.du_lieu.lay_du_lieu()[['age', 'bmi', 'children','charges']].corr(),
                         title='Ma trận tương quan'
                     )
-                    
-                    
+                elif tab_name == "Hồi quy tuyến tính sử dụng một tính năng duy nhất dựa trên tuổi":
+                        self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_dua_tren_1_dac_trung_tuoi()
                 
                     
                 

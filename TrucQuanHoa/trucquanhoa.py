@@ -15,12 +15,14 @@ class TrucQuanHoa:
             du_lieu: DataFrame chứa dữ liệu cần trực quan hóa
         """
         self.du_lieu = du_lieu
-        # Thay đổi cách thiết lập style
-        plt.style.use('default')  # Sử dụng style mặc định thay vì seaborn
-        sns.set_style("whitegrid")  # Thiết lập style cho seaborn riêng
+        
+        plt.style.use('default')  
+        sns.set_style("whitegrid")  
 
          
-    def ve_bieu_do_histogram(self, cot_gia_tri, nhan_x=None, nhan_y=None, chu_thich=None, cot_nhom=None, bien=None, mau_cu_the=None, so_khoang = None, mau_phan_loai = None, title=None):
+    def ve_bieu_do_histogram(self, cot_gia_tri,cot_nhom=None,
+                             nhan_x=None, nhan_y=None, chu_thich=None,
+                             bien=None, mau_cu_the=None, so_khoang = None, mau_phan_loai = None, title=None):
         """
         Vẽ biểu đồ histogram cho một biến số.
         """
@@ -38,11 +40,13 @@ class TrucQuanHoa:
                           legend_title=chu_thich,)
         fig.show()
 
-    def ve_bieu_do_scatter(self, cot_gia_tri, cot_nhom, mau_phan_loai=None, do_mo=None, du_lieu_them=None,title=None):
+    def ve_bieu_do_scatter(self, cot_gia_tri, cot_nhom, du_lieu = None, mau_phan_loai=None, do_mo=None, du_lieu_them=None,title=None):
         """
         Vẽ ma trận biểu đồ scatter plot cho nhiều biến số.
         """
-        fig = px.scatter(self.du_lieu, 
+        if du_lieu is None:
+            du_lieu = self.du_lieu
+        fig = px.scatter(du_lieu, 
                  x = cot_gia_tri, 
                  y = cot_nhom, 
                  color = mau_phan_loai, 
@@ -83,18 +87,6 @@ class TrucQuanHoa:
         plt.xticks(rotation = 0)
         plt.show()
 
-
-    def ve_bieu_do_box(self, cot_gia_tri, cot_nhom, title=None, figsize=(12, 6)):
-        """
-        Vẽ biểu đồ box plot để so sánh phân phối giữa các nhóm.
-        """
-        plt.figure(figsize=figsize)
-        sns.boxplot(x=cot_nhom, y=cot_gia_tri, data=self.du_lieu, palette=self.colors)
-        plt.title(title or f'Phân phối {cot_gia_tri} theo {cot_nhom}')
-        plt.xticks(rotation=45)
-        plt.grid(True, linestyle='--', alpha=0.7)
-        plt.tight_layout()
-        plt.show()
 
         
 
