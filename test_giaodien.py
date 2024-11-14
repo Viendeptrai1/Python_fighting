@@ -138,71 +138,106 @@ class GiaoDien:
         chart_type = st.selectbox(
             "Select Chart Type",
             [
-                "Biểu đồ Phân tích Dữ liệu Khám Phá (EDA)",
-                "Biểu đồ Tương Quan và Mối Quan Hệ",
-                "Biểu đồ Mô hình Hồi Quy",
-                "Mức Độ Quan Trọng Của Các Biến"
+                "Phân bố chi phí y tế theo các yếu tố",
+                "Phân bố theo giới tính và khu vực",
+                "Mối quan hệ chi phí với các yếu tố khác"
             ]
         )
         
-        if chart_type == "Biểu đồ Phân tích Dữ liệu Khám Phá (EDA)":
-            self.show_eda_charts()
-        elif chart_type == "Biểu đồ Tương Quan và Mối Quan Hệ":
-            self.show_correlation_charts()
-        elif chart_type == "Biểu đồ Mô hình Hồi Quy":
-            self.show_regression_charts()
+        if chart_type == "Phân bố chi phí y tế theo các yếu tố":
+            self.show_cost_distribution_charts()
+        elif chart_type == "Phân bố theo giới tính và khu vực":
+            self.show_demographic_charts()
         else:
-            self.show_feature_importance()
+            self.show_correlation_charts()
 
-    def show_eda_charts(self):
+    def show_cost_distribution_charts(self):
         col1, col2 = st.columns(2)
         
         with col1:
-            # Age distribution
-            fig = px.histogram(st.session_state.data, x='age', title='Age Distribution')
+            # Phân bố tuổi
+            fig = px.histogram(st.session_state.data, x='age',
+                             title='Phân bố tuổi')
             st.plotly_chart(fig, use_container_width=True)
-            
-            # BMI distribution
-            fig = px.histogram(st.session_state.data, x='bmi', title='BMI Distribution')
+
+            # Phân bố BMI
+            fig = px.histogram(st.session_state.data, x='bmi',
+                             title='Phân bố BMI(Body Mass Index)',
+                             color_discrete_sequence=['red'])
             st.plotly_chart(fig, use_container_width=True)
-        
+
         with col2:
-            # Charges by smoker
-            fig = px.box(st.session_state.data, x='smoker', y='charges', title='Charges by Smoker Status')
+            # Phí y tế theo người hút thuốc
+            fig = px.histogram(st.session_state.data, x='charges',
+                             color='smoker',
+                             title='Phí y tế hàng năm',
+                             color_discrete_sequence=['red', 'grey'])
             st.plotly_chart(fig, use_container_width=True)
-            
-            # Charges by region
-            fig = px.box(st.session_state.data, x='region', y='charges', title='Charges by Region')
+
+            # Chi phí theo giới tính
+            fig = px.histogram(st.session_state.data, x='charges',
+                             color='sex',
+                             title='Các khoản phí khác nhau về giới tính',
+                             color_discrete_sequence=['blue', 'red'])
+            st.plotly_chart(fig, use_container_width=True)
+
+        # Chi phí theo khu vực
+        fig = px.box(st.session_state.data, x='region', y='charges',
+                    title='Chi phí trên các khu vực khác nhau của Hoa Kỳ')
+        st.plotly_chart(fig, use_container_width=True)
+
+    def show_demographic_charts(self):
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Chi phí theo số lượng con
+            fig = px.box(st.session_state.data, x='children', y='charges',
+                        title='Chi phí phát sinh cho trẻ em')
+            st.plotly_chart(fig, use_container_width=True)
+
+            # Chi phí theo tuổi và người hút thuốc
+            fig = px.scatter(st.session_state.data, x='age', y='charges',
+                           color='smoker', opacity=0.8,
+                           hover_data=['sex'],
+                           title='Chi phí so với độ tuổi')
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:
+            # Chi phí theo BMI và người hút thuốc
+            fig = px.scatter(st.session_state.data, x='bmi', y='charges',
+                           color='smoker', opacity=0.8,
+                           hover_data=['sex'],
+                           title='Chi phí so với BMI')
             st.plotly_chart(fig, use_container_width=True)
 
     def show_correlation_charts(self):
-        # Scatter plot of Age vs Charges
-        fig = px.scatter(st.session_state.data, x='age', y='charges', 
-                        color='smoker', title='Age vs Charges by Smoker Status')
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # BMI vs Charges
-        fig = px.scatter(st.session_state.data, x='bmi', y='charges',
-                        color='smoker', title='BMI vs Charges by Smoker Status')
-        st.plotly_chart(fig, use_container_width=True)
+        col1, col2 = st.columns(2)
 
-    def show_regression_charts(self):
-        # Simple linear regression plot
-        fig = px.scatter(st.session_state.data, x='age', y='charges',
-                        trendline="ols", title='Age vs Charges (with trend line)')
-        st.plotly_chart(fig, use_container_width=True)
+        with col1:
+            # Chi phí theo số lượng con (violin plot)
+            fig = px.violin(st.session_state.data, x='children', y='charges',
+                          title='Chi phí so với số lượng con cái')
+            st.plotly_chart(fig, use_container_width=True)
 
-    def show_feature_importance(self):
-        # Simulated feature importance
-        features = ['age', 'bmi', 'children', 'smoker', 'region']
-        importance = np.random.uniform(0, 1, len(features))
-        importance = importance / importance.sum()
-        
-        fig = px.bar(x=features, y=importance,
-                    title='Feature Importance',
-                    labels={'x': 'Features', 'y': 'Importance Score'})
-        st.plotly_chart(fig, use_container_width=True)
+            # Chi phí theo giới tính và người hút thuốc
+            fig = px.box(st.session_state.data, x='sex', y='charges',
+                        color='smoker',
+                        title='Chi phí so với việc hút thuốc hay không hút thuốc theo giới tính')
+            st.plotly_chart(fig, use_container_width=True)
 
+        with col2:
+            # Chi phí theo khu vực và giới tính
+            fig = px.box(st.session_state.data, x='sex', y='charges',
+                        color='region',
+                        title='Chi phí so với vùng theo giới tính')
+            st.plotly_chart(fig, use_container_width=True)
+
+            # Ma trận tương quan
+            corr_data = st.session_state.data[['age', 'bmi', 'children', 'charges']].corr()
+            fig = px.imshow(corr_data,
+                          title='Ma trận tương quan',
+                          color_continuous_scale='RdBu')
+            st.plotly_chart(fig, use_container_width=True)
 if __name__ == "__main__":
     app = GiaoDien()
     app.main()

@@ -1,187 +1,186 @@
-import customtkinter as ctk
-from io import StringIO
-import sys
-
-ctk.set_appearance_mode("light")
-
-class ScrollableTabFrame(ctk.CTkFrame):
-    def __init__(self, master, **kwargs):
-        # Loại bỏ height từ kwargs nếu có để tránh xung đột
-        kwargs.pop('height', None)
-        super().__init__(master, **kwargs)
-        
-        # Container cho canvas và scrollbar
-        self.container = ctk.CTkFrame(self, fg_color="transparent")
-        self.container.pack(fill='x')
-        
-        # Tạo canvas với background phù hợp và chiều cao cố định
-        self.canvas = ctk.CTkCanvas(self.container, bg='#2a2d2e', highlightthickness=0, height=52)
-        self.scrollbar = ctk.CTkScrollbar(
-            self.container, 
-            orientation="horizontal",
-            command=self.canvas.xview,
-            height=16
-        )
-        
-        # Frame trong canvas để chứa các button
-        self.scrollable_frame = ctk.CTkFrame(self.canvas, fg_color="#2a2d2e")
-        
-        # Cấu hình canvas
-        self.canvas.configure(xscrollcommand=self.scrollbar.set)
-        
-        # Sắp xếp các widget
-        self.canvas.pack(side="top", fill="x", padx=0, pady=0)
-        self.scrollbar.pack(side="bottom", fill="x", padx=0)
-        
-        # Tạo window trong canvas
-        self.canvas_frame = self.canvas.create_window(
-            (0, 0),
-            window=self.scrollable_frame,
-            anchor="nw"
-        )
-        
-        # Bind các sự kiện
-        self.scrollable_frame.bind("<Configure>", self.on_frame_configure)
-        self.canvas.bind("<Configure>", self.on_canvas_configure)
-
-    def on_frame_configure(self, event):
-        bbox = self.canvas.bbox("all")
-        if bbox:
-            self.canvas.configure(scrollregion=(bbox[0]-5, bbox[1], bbox[2]+5, bbox[3]))
-        
-    def on_canvas_configure(self, event):
-        min_width = max(event.width, self.scrollable_frame.winfo_reqwidth())
-        self.canvas.itemconfig(self.canvas_frame, width=min_width)
+import streamlit as st
+import pandas as pd
+import numpy as np
 
 class GiaoDien:
-    def __init__(self, master, xu_ly_du_lieu, truc_quan_hoa):
+    def __init__(self):
+        st.set_page_config(page_title="Dự đoán giá bảo hiểm y tế", layout="wide")
+
+    def main(self):
+        st.title("Dự đoán giá bảo hiểm y tế")
         
-        self.master = master
-        master.title("Visual Data - Tab Example")
-        self.xu_ly_du_lieu = xu_ly_du_lieu
-        self.truc_quan_hoa = truc_quan_hoa
-
-        # Frame tiêu đề
-        self.frame_header = ctk.CTkFrame(master, fg_color="white")
-        self.frame_header.pack(fill='x')
-
-        self.label_title = ctk.CTkLabel(
-            self.frame_header, 
-            text="Visual Data", 
-            font=("Roboto", 24, "bold"), 
-            text_color="black"
+        menu = st.sidebar.selectbox(
+            "Menu",
+            ["Data List", "Create New", "Charts"]
         )
-        self.label_title.pack(pady=10)
-
-        # Frame cuộn chứa các tab với padding phù hợp
-        self.frame_tabs = ScrollableTabFrame(master, fg_color="#2a2d2e")
-        self.frame_tabs.pack(fill='x', padx=20, pady=(10, 5))
-
-        # Các nút tab
-        self.tabs = [
-            "Biểu đồ cột", 
-            "Biểu đồ tròn", 
-            "Xem Info dataframe",
-            "Biểu đồ đường",
-            "Biểu đồ scatter",
-            "Biểu đồ box",
-            "Biểu đồ violin",
-            "Biểu đồ heat map",
-            "Biểu đồ bar stack",
-            "Biểu đồ area",
-            "Biểu đồ bubble",
-            "Thống kê mô tả",
-            "Phân tích tương quan"
-        ]
-        self.buttons = []
         
-        # Tạo các button với padding nhỏ hơn
-        for idx, tab_name in enumerate(self.tabs):
-            button = ctk.CTkButton(
-                self.frame_tabs.scrollable_frame,
-                text=tab_name,
-                font=("Roboto", 14),
-                width=140,
-                height=40,
-                corner_radius=10,
-                command=lambda idx=idx: self.switch_tab(idx)
-            )
-            button.grid(row=0, column=idx, padx=6, pady=6)
-            self.buttons.append(button)
+        if menu == "Data List":
+            self.show_data_list()
+        elif menu == "Create New":
+            self.show_create_form()
+        else:
+            self.show_charts()
 
-        # Frame content
-        self.frame_content = ctk.CTkFrame(master, fg_color="white")
-        self.frame_content.pack(fill='both', expand=True, padx=20, pady=20)
+    # def show_data_list(self):
+    #     st.header("Data List")
 
-        # Frame chart
-        self.frame_chart = ctk.CTkFrame(self.frame_content, fg_color="white")
-        self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
+    #     col1, col2, col3, col4 = st.columns(4)
+    #     with col1:
+    #         search = st.text_input("Search...")
+    #     with col2:
+    #         filter_column = st.selectbox("Filter Column", [""] + list(st.session_state.data.columns))
+    #     with col3:
+    #         if filter_column:
+    #             filter_operator = st.selectbox("Filter Operator", ["equals", "greater than", "less than"])
+    #     with col4:
+    #         if filter_column:
+    #             filter_value = st.number_input("Filter Value", step=1.0)
 
-        # Textbox với thanh cuộn
-        self.text_info = ctk.CTkTextbox(
-            self.frame_content,
-            width=700,
-            height=400,
-            font=("Roboto", 12),
-            fg_color="white",
-            text_color="black",
-            wrap="none"
-        )
-        self.text_info.pack_forget()
-        
-        # Thêm scrollbar ngang
-        self.text_info_x_scrollbar = ctk.CTkScrollbar(
-            self.frame_content,
-            orientation="horizontal",
-            command=self.text_info.xview
-        )
-        self.text_info.configure(xscrollcommand=self.text_info_x_scrollbar.set)
+    #     df = st.session_state.data.copy()
+    #     if search:
+    #         mask = df.astype(str).apply(lambda x: x.str.contains(search, case=False)).any(axis=1)
+    #         df = df[mask]
 
-    def switch_tab(self, idx):
-        tab_name = self.tabs[idx]
-        
-        for i, button in enumerate(self.buttons):
-            if i == idx:
-                button.configure(
-                    fg_color="#3b8ed0",
-                    hover_color="#2b7cbd"
-                )
+    #     if filter_column and filter_operator and filter_value:
+    #         df = st.session_state.xu_ly.loc_du_lieu(filter_column, filter_value, filter_operator)
+
+    #     st.dataframe(df)
+    def show_data_list(self):
+        st.header("Data List")
+
+        # Search and Filter
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            search = st.text_input("Search...")
+        with col2:
+            filter_column = st.selectbox("Filter Column", [""] + list(st.session_state.data.columns))
+        with col3:
+            if filter_column:
+                filter_operator = st.selectbox("Filter Operator", ["contains", "equals", "greater than", "less than"])
             else:
-                button.configure(
-                    fg_color="#2a2d2e",
-                    hover_color="#404249"
-                )
-        
-        try:
-            if tab_name == "Xem Info dataframe":
-                self.frame_chart.pack_forget()
-                self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
-                self.text_info.configure(state="normal")
-                self.text_info.delete("1.0", "end")
-                info_text = self.capture_output(self.truc_quan_hoa.showinfo)
-                self.text_info.insert("1.0", info_text)
-                self.text_info.configure(state="disabled")
-                
+                filter_operator = ""
+        with col4:
+            if filter_column and filter_operator:
+                if filter_operator in ["equals", "greater than", "less than"]:
+                    filter_value = st.number_input("Filter Value", step=1.0)
+                else:
+                    filter_value = st.text_input("Filter Value")
             else:
-                self.text_info.pack_forget()
-                self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
-                if tab_name == "Biểu đồ cột":
-                    self.truc_quan_hoa.ve_bieu_do_cot("Branch", "Total", self.frame_chart)
-                elif tab_name == "Biểu đồ tròn":
-                    self.truc_quan_hoa.ve_bieu_do_tron("Product line", self.frame_chart)
+                filter_value = ""
+
+        # Sort
+        col1, col2 = st.columns(2)
+        with col1:
+            sort_column = st.selectbox("Sort By", [""] + list(st.session_state.data.columns))
+        with col2:
+            if sort_column:
+                sort_ascending = st.checkbox("Sort Ascending", value=True)
+            else:
+                sort_ascending = True
+
+        # Apply filters
+        df = st.session_state.data.copy()
+        if search:
+            mask = df.astype(str).apply(lambda x: x.str.contains(search, case=False)).any(axis=1)
+            df = df[mask]
+
+        if filter_column and filter_operator and filter_value:
+            if filter_operator == "contains":
+                df = df[df[filter_column].astype(str).str.contains(filter_value, case=False)]
+            elif filter_operator == "equals":
+                df = df[df[filter_column] == float(filter_value)]
+            elif filter_operator == "greater than":
+                df = df[df[filter_column] > float(filter_value)]
+            elif filter_operator == "less than":
+                df = df[df[filter_column] < float(filter_value)]
+
+        # Sort
+        if sort_column:
+            df = df.sort_values(by=sort_column, ascending=sort_ascending)
+
+        # Display data wi th pagination
+        items_per_page = 10
+        total_pages = len(df) // items_per_page + (1 if len(df) % items_per_page > 0 else 0)
+        current_page = st.session_state.get("current_page", 1)
+
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("Previous") and current_page > 1:
+                st.session_state.current_page = current_page - 1
+        with col2:
+            st.write(f"Page {current_page} of {total_pages}")
+        with col3:
+            if st.button("Next") and current_page < total_pages:
+                st.session_state.current_page = current_page + 1
+
+        start_idx = (current_page - 1) * items_per_page
+        end_idx = min(start_idx + items_per_page, len(df))
+
+        # Display data
+        st.dataframe(df.iloc[start_idx:end_idx], use_container_width=True)
+
+        # Delete functionality
+        if st.button("Delete Selected"):
+            st.warning("Delete functionality would go here")
+    def show_create_form(self):
+        st.header("Create/Update Data")
+        
+        with st.form("create_form"):
+            age = st.number_input("Age", min_value=0, max_value=100, value=30)
+            bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=25.0)
+            children = st.number_input("Number of Children", min_value=0, max_value=10, value=0)
+            smoker = st.selectbox("Smoker", ["yes", "no"])
+            region = st.selectbox("Region", ["southeast", "southwest", "northeast", "northwest"])
             
-        except Exception as e:
-            self.frame_chart.pack_forget()
-            self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
-            self.text_info.configure(state="normal")
-            self.text_info.delete("1.0", "end")
-            self.text_info.insert("1.0", f"Đã xảy ra lỗi: {str(e)}")
-            self.text_info.configure(state="disabled")
+            if st.form_submit_button("Save"):
+                new_data = {
+                    'age': age,
+                    'bmi': bmi,
+                    'children': children,
+                    'smoker': smoker,
+                    'region': region,
+                    'charges': np.random.uniform(5000, 50000)
+                }
+                st.session_state.data = pd.concat([
+                    st.session_state.data,
+                    pd.DataFrame([new_data])
+                ], ignore_index=True)
+                st.success("Data saved successfully!")
 
-    def capture_output(self, func):
-        buffer = StringIO()
-        old_stdout = sys.stdout
-        sys.stdout = buffer
-        func()
-        sys.stdout = old_stdout
-        return buffer.getvalue()
+    def show_charts(self):
+        st.header("Charts")
+        
+        chart_type = st.selectbox(
+            "Select Chart Type",
+            ["Distribution", "Relationships", "Correlation Analysis"]
+        )
+        
+        if chart_type == "Distribution":
+            col1, col2 = st.columns(2)
+            with col1:
+                fig = st.session_state.truc_quan.ve_bieu_do_phan_phoi('age')
+                st.plotly_chart(fig, use_container_width=True)
+                
+                fig = st.session_state.truc_quan.ve_bieu_do_phan_phoi('bmi')
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                fig = st.session_state.truc_quan.ve_bieu_do_box('smoker', 'charges')
+                st.plotly_chart(fig, use_container_width=True)
+                
+                fig = st.session_state.truc_quan.ve_bieu_do_box('region', 'charges')
+                st.plotly_chart(fig, use_container_width=True)
+                
+        elif chart_type == "Relationships":
+            col1, col2 = st.columns(2)
+            with col1:
+                fig = st.session_state.truc_quan.ve_bieu_do_scatter('age', 'charges', 'smoker')
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                fig = st.session_state.truc_quan.ve_bieu_do_scatter('bmi', 'charges', 'smoker')
+                st.plotly_chart(fig, use_container_width=True)
+        
+        else:
+            fig = st.session_state.truc_quan.ve_bieu_do_tuong_quan()
+            st.plotly_chart(fig, use_container_width=True)
