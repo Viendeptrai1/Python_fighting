@@ -22,10 +22,6 @@ class PhanTichVaDuDoan:
         self.du_lieu = du_lieu
     
     def hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(self, dac_trung, du_lieu):
-        # nguoi_hut_thuoc_df = self.du_lieu[self.du_lieu['smoker'] == 'yes']
-        # plt.title('Chi phí so với độ tuổi dựa trên đối tượng hút thuốc')
-        # sns.scatterplot(data=nguoi_hut_thuoc_df, x='age', y='charges', alpha=0.7, s=15)
-        # plt.show()
         
         def uoc_tinh_chi_phi(tmp, a, b):
             return a * tmp + b 
@@ -75,7 +71,7 @@ class PhanTichVaDuDoan:
 
     def hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(self, dac_trung, du_lieu):
         model = LinearRegression()
-        dau_vao_df = du_lieu[[dac_trung]]
+        dau_vao_df = du_lieu[dac_trung]
         chi_phi_thuc_te_df = du_lieu['charges']
     
         model.fit(dau_vao_df, chi_phi_thuc_te_df)

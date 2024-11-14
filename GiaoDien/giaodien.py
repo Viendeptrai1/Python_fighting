@@ -113,7 +113,7 @@ class GiaoDien:
             "Hình dung về sự phân bố chi phí y tế liên quan đến các yếu tố khác như 'giới tính' và 'khu vực'.",
             "Hình dung về sự phân bố của các cột 'giới tính', 'khu vực' và 'số lượng con cái'.",
             "Hình dung về cách cột 'chi phí' liên quan đến các cột khác ('số lượng con cái', 'giới tính', 'khu vực' và 'người hút thuốc').",
-            "Hồi quy tuyến tính sử dụng một tính năng duy nhất dựa trên tuổi"
+            "Hồi quy tuyến tính sử dụng một đặc trung"
         ]
         self.buttons = []
         
@@ -254,10 +254,25 @@ class GiaoDien:
                         corr_matrix = self.du_lieu.lay_du_lieu()[['age', 'bmi', 'children','charges']].corr(),
                         title='Ma trận tương quan'
                     )
-                elif tab_name == "Hồi quy tuyến tính sử dụng một tính năng duy nhất dựa trên tuổi":
-                    nguoi_khong_hut_thuoc_df = self.du_lieu.lay_du_lieu()[self.du_lieu.lay_du_lieu()['smoker'] == 'no']   
-                    self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham('age', nguoi_khong_hut_thuoc_df)
-                
+                elif tab_name == "Hồi quy tuyến tính sử dụng một đặc trung":
+                    choice = int(input("Chọn kiểu dữ liệu cần đưa vào(1: người hút thuốc, 2: người không hút thuốc): "))
+                    if choice == 1:
+                        nguoi_hut_thuoc_df = self.du_lieu.lay_du_lieu()[self.du_lieu.lay_du_lieu()['smoker'] == 'yes']
+                        choice = int(input("Chọn cách vẽ hàm hồi quy(1: thủ công, 2: sử dụng hàm): "))
+                        if choice == 1:
+                            self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_thu_cong('age', nguoi_hut_thuoc_df)
+                        elif choice == 2:
+                            self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(['age'], nguoi_hut_thuoc_df)
+                    elif choice == 2:
+                        nguoi_khong_hut_thuoc_df = self.du_lieu.lay_du_lieu()[self.du_lieu.lay_du_lieu()['smoker'] == 'no']
+                        choice = int(input("Chọn cách vẽ hàm hồi quy(1: thủ công, 2: sử dụng hàm): "))
+                        if choice == 1:
+                            self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_thu_cong('age', nguoi_khong_hut_thuoc_df)
+                        elif choice == 2:
+                            self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(['age'], nguoi_khong_hut_thuoc_df)
+                    else:
+                        pass
+                    
                     
                 
                 
