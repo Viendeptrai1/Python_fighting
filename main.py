@@ -21,7 +21,7 @@ def main():
     root.geometry("800x600") 
 
     # Khởi tạo giao diện và truyền các đối tượng cần thiết
-    GiaoDien(root, xu_ly_du_lieu, truc_quan_hoa, phan_tich_va_du_doan,du_lieu)  
+    GiaoDien(root, xu_ly_du_lieu, truc_quan_hoa, phan_tich_va_du_doan, du_lieu)  
 
     # Chạy giao diện
     root.mainloop()  

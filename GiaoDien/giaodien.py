@@ -255,7 +255,8 @@ class GiaoDien:
                         title='Ma trận tương quan'
                     )
                 elif tab_name == "Hồi quy tuyến tính sử dụng một tính năng duy nhất dựa trên tuổi":
-                        self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_dua_tren_1_dac_trung_tuoi()
+                    nguoi_khong_hut_thuoc_df = self.du_lieu.lay_du_lieu()[self.du_lieu.lay_du_lieu()['smoker'] == 'no']   
+                    self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham('age', nguoi_khong_hut_thuoc_df)
                 
                     
                 
