@@ -113,7 +113,8 @@ class GiaoDien:
             "Hình dung về sự phân bố chi phí y tế liên quan đến các yếu tố khác như 'giới tính' và 'khu vực'.",
             "Hình dung về sự phân bố của các cột 'giới tính', 'khu vực' và 'số lượng con cái'.",
             "Hình dung về cách cột 'chi phí' liên quan đến các cột khác ('số lượng con cái', 'giới tính', 'khu vực' và 'người hút thuốc').",
-            "Hồi quy tuyến tính sử dụng một đặc trung"
+            "Hồi quy tuyến tính sử dụng một đặc trung",
+            "Hồi quy tuyến tinh sử dụng nhiều đặc trưng"
         ]
         self.buttons = []
         
@@ -272,7 +273,8 @@ class GiaoDien:
                             self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(['age'], nguoi_khong_hut_thuoc_df)
                     else:
                         pass
-                    
+                elif tab_name == "Hồi quy tuyến tinh sử dụng nhiều đặc trưng":
+                    self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_nhieu_dac_trung_su_dung_ham(['age', 'bmi', 'children'], self.du_lieu.lay_du_lieu())
                     
                 
                 

@@ -45,14 +45,10 @@ class PhanTichVaDuDoan:
             plt.ylabel('Charges')
             plt.legend(['Estimate', 'Actual'])
             
-            if b > 0:
-                plt.text(0.05, 0.90,
-                     f'y = {a:.2f} * x + {b:.2f}', 
-                     transform=plt.gca().transAxes, fontsize=12, verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
-            else:
-                plt.text(0.05, 0.90,
-                     f'y = {a:.2f} * x {b:.2f}', 
-                     transform=plt.gca().transAxes, fontsize=12, verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
+            equation_text = f'y = {a:.2f} * x + {b:.2f}' if b > 0 else f'y = {a:.2f} * x {b:.2f}'
+            plt.text(0.05, 0.90,
+                 equation_text, 
+                 transform=plt.gca().transAxes, fontsize=12, verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
     
             loss = tinh_rmse(chi_phi_thuc_te_df, chi_phi_duoc_uoc_tinh)
                              
@@ -93,13 +89,9 @@ class PhanTichVaDuDoan:
 
         a = model.coef_[0]
         b = model.intercept_
-        if b > 0:
-            plt.text(0.05, 0.90,
-                 f'y = {a:.2f} * x + {b:.2f}', 
-                 transform=plt.gca().transAxes, fontsize=12, verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
-        else:
-            plt.text(0.05, 0.90,
-                 f'y = {a:.2f} * x {b:.2f}', 
+        equation_text = f'y = {a:.2f} * x + {b:.2f}' if b > 0 else f'y = {a:.2f} * x {b:.2f}'
+        plt.text(0.05, 0.90,
+                 equation_text, 
                  transform=plt.gca().transAxes, fontsize=12, verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
         
         loss = tinh_rmse(chi_phi_thuc_te_df, chi_phi_duoc_uoc_tinh)
@@ -109,7 +101,36 @@ class PhanTichVaDuDoan:
 
         plt.show()
 
+
+    def hoi_quy_tuyen_tinh_nhieu_dac_trung_su_dung_ham(self, dac_trung, du_lieu):
+        model = LinearRegression()
+        dau_vao_df = du_lieu[dac_trung]
+        chi_phi_thuc_te_df = du_lieu['charges']
+
+        model.fit(dau_vao_df, chi_phi_thuc_te_df)
+
+        chi_phi_duoc_uoc_tinh = model.predict(dau_vao_df)
+
+        def tinh_rmse(thuc_te, du_doan):
+            sai_so = thuc_te - du_doan
+            sai_so_binh_phuong = sai_so ** 2
+            trung_binh_sai_so_binh_phuong = np.mean(sai_so_binh_phuong)
+            rmse = np.sqrt(trung_binh_sai_so_binh_phuong)
+            return rmse
         
+        loss = tinh_rmse(chi_phi_thuc_te_df, chi_phi_duoc_uoc_tinh)
+        for i, dac_trung_don in enumerate(dac_trung):
+            fig = px.scatter(du_lieu, x=dac_trung_don, y='charges', color='smoker', title=f'{dac_trung_don} vs Charges')
+            
+            a = model.coef_[i]
+            b = model.intercept_
+            fig.add_annotation(x=0.05, y=0.95,
+                               xref='paper', yref='paper',
+                               text=f'RMSE Loss: {loss:.2f}', showarrow=False, 
+                               font=dict(size=12, color='black'), bgcolor='white', opacity=0.5)
+            fig.show()
+
+
         
     
         

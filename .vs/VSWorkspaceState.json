@@ -1,12 +1,13 @@
 {
   "ExpandedNodes": [
     "",
+    "\\Data",
     "\\DocDuLieu",
     "\\GiaoDien",
     "\\PhanTichVaDuDoan",
     "\\TrucQuanHoa",
     "\\XuLyDuLieu"
   ],
-  "SelectedNode": "\\main.py",
+  "SelectedNode": "\\GiaoDien\\giaodien.py",
   "PreviewInSolutionExplorer": false
 }
