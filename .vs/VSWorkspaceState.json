@@ -2,10 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\Data",
+    "\\DocDuLieu",
     "\\GiaoDien",
     "\\TrucQuanHoa",
     "\\XuLyDuLieu"
   ],
-  "SelectedNode": "\\XuLyDuLieu\\CRUD.py",
+  "SelectedNode": "\\DocDuLieu\\docdulieu.py",
   "PreviewInSolutionExplorer": false
 }

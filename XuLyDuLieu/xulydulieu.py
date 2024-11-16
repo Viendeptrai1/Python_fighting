@@ -1,41 +1,43 @@
 import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 class XuLyDuLieu:
     """
-    Class này thực hiện các bước xử lý và biến đổi dữ liệu.
+    Class thực hiện các thao tác xử lý dữ liệu cơ bản.
     """
-
     def __init__(self, du_lieu):
-        """
-        Khởi tạo đối tượng XuLyDuLieu.
-
-        Args:
-          du_lieu: DataFrame chứa dữ liệu.
-        """
         self.du_lieu = du_lieu
-
-    def lam_sach_du_lieu(self):
-        """
-        Thay thế giá trị ngoại lai bằng giá trị trung bình.
-        """
-        for cot in ['Unit price', 'Quantity', 'Total']:  # Chọn các cột số cần xử lý
-            Q1 = self.du_lieu[cot].quantile(0.25)
-            Q3 = self.du_lieu[cot].quantile(0.75)
-            IQR = Q3 - Q1
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
-            self.du_lieu[cot] = self.du_lieu[cot].mask(
-                (self.du_lieu[cot] < lower_bound) | (self.du_lieu[cot] > upper_bound), 
-                self.du_lieu[cot].mean()
-            )
-
-    def tinh_them_chi_so(self):
-        """
-        Tính toán thêm các chỉ số mới.
-        """
         
-    def chuyen_doi_du_lieu(self):
+    def chuan_hoa_du_lieu(self, cot_so):
         """
-        Chuyển đổi dữ liệu sang định dạng phù hợp.
+        Chuẩn hóa dữ liệu số về khoảng [0,1]
+        Args:
+            cot_so: List các cột số cần chuẩn hóa
+        Returns:
+            DataFrame đã chuẩn hóa
         """
-      
+        scaler = StandardScaler()
+        self.du_lieu[cot_so] = scaler.fit_transform(self.du_lieu[cot_so])
+        return self.du_lieu
+    
+    def xu_ly_du_lieu_thieu(self, phuong_phap='mean'):
+        """
+        Xử lý dữ liệu thiếu bằng các phương pháp khác nhau
+        Args:
+            phuong_phap: Phương pháp xử lý ('mean', 'median', 'mode', 'drop')
+        Returns:
+            DataFrame đã xử lý dữ liệu thiếu
+        """
+        if phuong_phap == 'drop':
+            self.du_lieu = self.du_lieu.dropna()
+        else:
+            for column in self.du_lieu.columns:
+                if self.du_lieu[column].isnull().any():
+                    if phuong_phap == 'mean':
+                        self.du_lieu[column].fillna(self.du_lieu[column].mean(), inplace=True)
+                    elif phuong_phap == 'median':
+                        self.du_lieu[column].fillna(self.du_lieu[column].median(), inplace=True)
+                    elif phuong_phap == 'mode':
+                        self.du_lieu[column].fillna(self.du_lieu[column].mode()[0], inplace=True)
+        return self.du_lieu
