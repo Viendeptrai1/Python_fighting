@@ -1,229 +1,149 @@
-import customtkinter as ctk
-from io import StringIO
-import sys
-import platform
-
-ctk.set_appearance_mode("light")
-
-class ScrollableTabFrame(ctk.CTkFrame):
-    def __init__(self, master, **kwargs):
-        # Loại bỏ height từ kwargs nếu có để tránh xung đột
-        kwargs.pop('height', None)
-        super().__init__(master, **kwargs)
-        
-        # Container cho canvas và scrollbar
-        self.container = ctk.CTkFrame(self, fg_color="transparent")
-        self.container.pack(fill='x')  # Thay đổi từ 'both' thành 'x'
-        
-        # Tạo canvas với background phù hợp và chiều cao cố định
-        self.canvas = ctk.CTkCanvas(self.container, bg='#2a2d2e', highlightthickness=0, height=52)  # Chiều cao = button height + 2*padding
-        self.scrollbar = ctk.CTkScrollbar(
-            self.container, 
-            orientation="horizontal",
-            command=self.canvas.xview,
-            height=16
-        )
-        
-        # Frame trong canvas để chứa các button
-        self.scrollable_frame = ctk.CTkFrame(self.canvas, fg_color="#2a2d2e")
-        
-        # Cấu hình canvas
-        self.canvas.configure(xscrollcommand=self.scrollbar.set)
-        
-        # Sắp xếp các widget
-        self.canvas.pack(side="top", fill="x", padx=0, pady=0)
-        self.scrollbar.pack(side="bottom", fill="x", padx=0)
-        
-        # Tạo window trong canvas
-        self.canvas_frame = self.canvas.create_window(
-            (0, 0),
-            window=self.scrollable_frame,
-            anchor="nw"
-        )
-        
-        # Bind các sự kiện
-        self.scrollable_frame.bind("<Configure>", self.on_frame_configure)
-        self.canvas.bind("<Configure>", self.on_canvas_configure)
-        
-        # Bind sự kiện cuộn chuột
-        self.bind_mouse_scroll()
-
-    # [Giữ nguyên các phương thức khác của ScrollableTabFrame]
-    def bind_mouse_scroll(self):
-        if platform.system() == 'Windows':
-            self.canvas.bind_all("<MouseWheel>", self._on_mousewheel_windows)
-        elif platform.system() == 'Darwin':
-            self.canvas.bind_all("<MouseWheel>", self._on_mousewheel_macos)
-            self.canvas.bind_all("<Option-MouseWheel>", self._on_mousewheel_macos_fast)
-        else:
-            self.canvas.bind_all("<Button-4>", self._on_mousewheel_linux)
-            self.canvas.bind_all("<Button-5>", self._on_mousewheel_linux)
-
-    def _on_mousewheel_windows(self, event):
-        self.canvas.xview_scroll(int(-1 * (event.delta / 120)), "units")
-
-    def _on_mousewheel_macos(self, event):
-        self.canvas.xview_scroll(int(event.delta), "units")
-
-    def _on_mousewheel_macos_fast(self, event):
-        self.canvas.xview_scroll(int(event.delta * 2), "units")
-
-    def _on_mousewheel_linux(self, event):
-        if event.num == 4:
-            self.canvas.xview_scroll(-1, "units")
-        elif event.num == 5:
-            self.canvas.xview_scroll(1, "units")
-        
-    def on_frame_configure(self, event):
-        bbox = self.canvas.bbox("all")
-        if bbox:
-            self.canvas.configure(scrollregion=(bbox[0]-5, bbox[1], bbox[2]+5, bbox[3]))
-        
-    def on_canvas_configure(self, event):
-        min_width = max(event.width, self.scrollable_frame.winfo_reqwidth())
-        self.canvas.itemconfig(self.canvas_frame, width=min_width)
+import streamlit as st
+import pandas as pd
+from collections import deque
+from .components.data_list import DataListComponent
+from .components.change_history import ChangeHistoryComponent
+from .components.crud_form import CRUDFormComponent
+from .components.charts import ChartsComponent
+from .components.regression import RegressionComponent
+import random  # Thêm import random
 
 class GiaoDien:
-    def __init__(self, master, xu_ly_du_lieu, truc_quan_hoa):
-        self.master = master
-        master.title("Visual Data - Tab Example")
-        self.xu_ly_du_lieu = xu_ly_du_lieu
-        self.truc_quan_hoa = truc_quan_hoa
-
-        # Frame tiêu đề
-        self.frame_header = ctk.CTkFrame(master, fg_color="white")
-        self.frame_header.pack(fill='x')
-
-        self.label_title = ctk.CTkLabel(
-            self.frame_header, 
-            text="Visual Data", 
-            font=("Roboto", 24, "bold"), 
-            text_color="black"
+    def __init__(self, truc_quan_hoa, du_lieu, phan_tich_va_du_doan):
+        # Thiết lập giao diện trước
+        st.set_page_config(
+            page_title="Dự đoán giá bảo hiểm y tế",
+            layout="wide",
+            initial_sidebar_state="expanded"
         )
-        self.label_title.pack(pady=10)
 
-        # Frame cuộn chứa các tab với padding phù hợp
-        self.frame_tabs = ScrollableTabFrame(master, fg_color="#2a2d2e")  # Đã loại bỏ height
-        self.frame_tabs.pack(fill='x', padx=20, pady=(10, 5))
-
-        # Các nút tab
-        self.tabs = [
-            "Biểu đồ cột", 
-            "Biểu đồ tròn", 
-            "Xem Info dataframe",
-            "Biểu đồ đường",
-            "Biểu đồ scatter",
-            "Biểu đồ box",
-            "Biểu đồ violin",
-            "Biểu đồ heat map",
-            "Biểu đồ bar stack",
-            "Biểu đồ area",
-            "Biểu đồ bubble",
-            "Thống kê mô tả",
-            "Phân tích tương quan",
-            "Biểu đồ cột", 
-            "Biểu đồ tròn", 
-            "Xem Info dataframe",
-            "Biểu đồ đường",
-            "Biểu đồ scatter",
-            "Biểu đồ box",
-            "Biểu đồ violin",
-            "Biểu đồ heat map",
-            "Biểu đồ bar stack",
-            "Biểu đồ area",
-            "Biểu đồ bubble",
-            "Thống kê mô tả",
-            "Phân tích tương quan"
-        ]
-        self.buttons = []
-        
-        # Tạo các button với padding nhỏ hơn
-        for idx, tab_name in enumerate(self.tabs):
-            button = ctk.CTkButton(
-                self.frame_tabs.scrollable_frame,
-                text=tab_name,
-                font=("Roboto", 14),
-                width=140,
-                height=40,
-                corner_radius=10,
-                command=lambda idx=idx: self.switch_tab(idx)
-            )
-            button.grid(row=0, column=idx, padx=6, pady=6)
-            self.buttons.append(button)
-
-        # [Giữ nguyên phần còn lại của class GiaoDien]
-        # Frame content
-        self.frame_content = ctk.CTkFrame(master, fg_color="white")
-        self.frame_content.pack(fill='both', expand=True, padx=20, pady=20)
-
-        # Frame chart
-        self.frame_chart = ctk.CTkFrame(self.frame_content, fg_color="white")
-        self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
-
-        # Textbox với thanh cuộn
-        self.text_info = ctk.CTkTextbox(
-            self.frame_content,
-            width=700,
-            height=400,
-            font=("Roboto", 12),
-            fg_color="white",
-            text_color="black",
-            wrap="none"
-        )
-        self.text_info.pack_forget()
-
-    def switch_tab(self, idx):
-        tab_name = self.tabs[idx]
-        
-        for i, button in enumerate(self.buttons):
-            if i == idx:
-                button.configure(
-                    fg_color="#3b8ed0",
-                    hover_color="#2b7cbd"
-                )
-            else:
-                button.configure(
-                    fg_color="#2a2d2e",
-                    hover_color="#404249"
-                )
-        
-        try:
-            if tab_name == "Xem Info dataframe":
-                self.frame_chart.pack_forget()
-                self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
-                self.text_info.configure(state="normal")
-                self.text_info.delete("1.0", "end")
-                info_text = self.capture_output(self.truc_quan_hoa.showinfo)
-                self.text_info.insert("1.0", info_text)
-                self.text_info.configure(state="disabled")
-            else:
-                self.text_info.pack_forget()
-                self.frame_chart.pack(fill='both', expand=True, padx=10, pady=10)
-                if tab_name == "Biểu đồ cột":
-                    self.truc_quan_hoa.ve_bieu_do_cot("Branch", "Total", self.frame_chart)
-                elif tab_name == "Biểu đồ tròn":
-                    self.truc_quan_hoa.ve_bieu_do_tron("Product line", self.frame_chart)
+        # Thêm CSS cho theme ngày Nhà giáo
+        teachers_day_css = """
+        <style>
+            /* CSS cho theme 20/11 */
+            .teachers-day {
+                background: linear-gradient(135deg, #FFD700, #FFA500);
+                color: #800080;
+                font-family: 'Arial', sans-serif;
+            }
             
-        except Exception as e:
-            self.frame_chart.pack_forget()
-            self.text_info.pack(fill='both', expand=True, padx=10, pady=10)
-            self.text_info.configure(state="normal")
-            self.text_info.delete("1.0", "end")
-            self.text_info.insert("1.0", f"Đã xảy ra lỗi: {str(e)}")
-            self.text_info.configure(state="disabled")
+            .teachers-day .stButton button {
+                background-color: #9370DB;
+                color: white;
+                border: 2px solid #800080;
+                border-radius: 20px;
+            }
+            
+            .teachers-day .stSelectbox {
+                background-color: #DDA0DD;
+                color: #800080;
+            }
+            
+            .teachers-day h1, .teachers-day h2, .teachers-day h3 {
+                color: #800080;
+                text-shadow: 2px 2px 4px #FFD700;
+            }
+            
+            /* Hiệu ứng hoa rơi */
+            @keyframes flowerfall {
+                0% { transform: translateY(-10px) rotate(0deg); }
+                100% { transform: translateY(100vh) rotate(360deg); }
+            }
+            
+            .flower {
+                position: fixed;
+                font-size: 24px;
+                animation: flowerfall 6s linear infinite;
+            }
+            
+            /* Hiệu ứng viền cho dataframe */
+            .teachers-day .dataframe {
+                border: 2px solid #800080;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(128, 0, 128, 0.3);
+            }
+        </style>
+        """
+        st.markdown(teachers_day_css, unsafe_allow_html=True)
 
-    def capture_output(self, func):
-        buffer = StringIO()
-        old_stdout = sys.stdout
-        sys.stdout = buffer
-        func()
-        sys.stdout = old_stdout
-        return buffer.getvalue()
+        # Khởi tạo trạng thái hoa rơi trong session_state nếu chưa có
+        if 'show_flowers' not in st.session_state:
+            st.session_state.show_flowers = True
 
-if __name__ == "__main__":
-    root = ctk.CTk()
-    xu_ly_du_lieu = None
-    truc_quan_hoa = None
-    app = GiaoDien(root, xu_ly_du_lieu, truc_quan_hoa)
-    root.geometry("800x600")
-    root.mainloop()
+        # Sau đó mới khởi tạo các thuộc tính
+        self.truc_quan_hoa = truc_quan_hoa
+        self.du_lieu = du_lieu
+        self.phan_tich_va_du_doan = phan_tich_va_du_doan
+        
+        # Tiếp theo là khởi tạo session_state
+        self._initialize_session_state()
+        
+        # Cuối cùng mới khởi tạo các components
+        self.data_list = DataListComponent(st.session_state)
+        self.change_history = ChangeHistoryComponent(st.session_state)
+        self.crud_form = CRUDFormComponent(st.session_state)
+        self.charts = ChartsComponent(truc_quan_hoa, du_lieu)
+        self.regression = RegressionComponent(phan_tich_va_du_doan)
+
+    def _initialize_session_state(self):
+        """Khởi tạo các giá trị trong session state"""
+        if 'original_data' not in st.session_state:
+            data = self.du_lieu.lay()
+            if data is not None:
+                st.session_state.original_data = data.copy()
+                # Thêm cột ID cho dữ liệu gốc
+                st.session_state.original_data.insert(0, 'ID', range(1, len(st.session_state.original_data) + 1))
+                
+                # Khởi tạo các session state khác
+                st.session_state.modified_data = st.session_state.original_data.copy()
+                st.session_state.modified_changes = pd.DataFrame(
+                    False, 
+                    index=st.session_state.modified_data.index,
+                    columns=st.session_state.modified_data.columns
+                )
+                st.session_state.deleted_records_queue = deque(maxlen=50)
+            else:
+                st.error("Không thể đọc dữ liệu")
+                return
+
+    def chay(self):
+        st.write(f'<h1 style="text-align:center;">📚 Dự đoán giá bảo hiểm y tế 👩‍🏫</h1>', unsafe_allow_html=True)
+
+        # Menu sidebar với icon giáo dục
+        menu = st.sidebar.selectbox(
+            "📋 Menu",
+            ["Data List", "Change History", "CRUD", "Charts", "Xem hồi quy"]
+        )
+
+        # Thêm thông điệp ngày Nhà giáo và nút bật/tắt hoa rơi
+        st.sidebar.markdown("""
+        ---
+        ### 🎉 Chào mừng ngày Nhà giáo Việt Nam 20/11
+        *"Không thầy đố mày làm nên"*
+        
+        👨‍🏫 Tri ân những người đã và đang cống hiến cho sự nghiệp trồng người
+        """)
+        
+        # Nút bật/tắt hoa rơi
+        show_flowers = st.sidebar.checkbox("🌸 Hiệu ứng hoa rơi", value=st.session_state.show_flowers)
+        st.session_state.show_flowers = show_flowers
+
+        # Thêm hiệu ứng hoa rơi nếu được bật
+        if show_flowers:
+            flowers = "".join([
+                f'<div class="flower" style="left: {random.uniform(0, 100)}%; animation-delay: {random.uniform(0, 5)}s;">🌸</div>'
+                for _ in range(20)
+            ])
+            st.markdown(flowers, unsafe_allow_html=True)
+
+        # Render component tương ứng
+        if menu == "Data List":
+            self.data_list.xem_du_lieu()
+        elif menu == "Change History":
+            self.change_history.xem_lich_su()
+        elif menu == "CRUD":
+            self.crud_form.quan_ly()
+        elif menu == "Charts":
+            self.charts.ve_bieu_do()
+        elif menu == "Xem hồi quy":
+            self.regression.ve_hoi_quy()
