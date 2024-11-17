@@ -88,7 +88,18 @@ class ChartsComponent:
                     title='Chi phí phát sinh cho trẻ em'
                 )
                 st.plotly_chart(fig_charges_children, use_container_width=True, key="hist_charges_children")
-
+                
+                # Biểu đồ scatter BMI và chi phí
+                fig_bmi_charges = self.truc_quan_hoa.ve_bieu_do_scatter(
+                    cot_gia_tri='bmi',
+                    cot_nhom='charges',
+                    mau_phan_loai='smoker',
+                    do_mo=0.8,
+                    du_lieu_them=['sex'],
+                    title='Chi phí so với BMI'
+                )
+                st.plotly_chart(fig_bmi_charges, use_container_width=True, key="scatter_bmi_charges")
+                
             with col2:
                 # Biểu đồ scatter tuổi và chi phí
                 fig_age_charges = self.truc_quan_hoa.ve_bieu_do_scatter(
@@ -101,16 +112,6 @@ class ChartsComponent:
                 )
                 st.plotly_chart(fig_age_charges, use_container_width=True, key="scatter_age_charges")
 
-                # Biểu đồ scatter BMI và chi phí
-                fig_bmi_charges = self.truc_quan_hoa.ve_bieu_do_scatter(
-                    cot_gia_tri='bmi',
-                    cot_nhom='charges',
-                    mau_phan_loai='smoker',
-                    do_mo=0.8,
-                    du_lieu_them=['sex'],
-                    title='Chi phí so với BMI'
-                )
-                st.plotly_chart(fig_bmi_charges, use_container_width=True, key="scatter_bmi_charges")
 
         with tab3:
             col1, col2 = st.columns(2)
