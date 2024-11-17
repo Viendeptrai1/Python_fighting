@@ -155,7 +155,7 @@ class RegressionComponent:
                 except Exception as e:
                     st.error(f"Lỗi khi dự đoán: {str(e)}")
                     
-    def quanly(self):
+    def quan_ly(self):
         st.markdown("""
             <div class="regression-section">
                 <h2>📊 Phân tích và Dự đoán</h2>

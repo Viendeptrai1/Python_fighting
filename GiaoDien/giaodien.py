@@ -128,4 +128,4 @@ class GiaoDien:
             elif menu == "Charts":
                 self.charts.ve_bieu_do()
             elif menu == "Phân tích hồi quy":
-                self.regression.quanly()
+                self.regression.quan_ly()

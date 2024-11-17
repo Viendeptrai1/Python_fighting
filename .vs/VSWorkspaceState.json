@@ -4,10 +4,11 @@
     "\\Data",
     "\\DocDuLieu",
     "\\GiaoDien",
+    "\\GiaoDien\\components",
     "\\PhanTichVaDuDoan",
     "\\TrucQuanHoa",
     "\\XuLyDuLieu"
   ],
-  "SelectedNode": "\\GiaoDien\\giaodien.py",
+  "SelectedNode": "\\GiaoDien\\components\\charts.py",
   "PreviewInSolutionExplorer": false
 }
