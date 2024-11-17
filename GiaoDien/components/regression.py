@@ -155,26 +155,3 @@ class RegressionComponent:
                 except Exception as e:
                     st.error(f"Lỗi khi dự đoán: {str(e)}")
                     
-    def quanly(self):
-        st.markdown("""
-            <div class="regression-section">
-                <h2>📊 Phân tích và Dự đoán</h2>
-                <p>Quản lý và thực hiện phân tích hồi quy, dự đoán giá bảo hiểm y tế.</p>
-            </div>
-        """, unsafe_allow_html=True)
-
-        # Chọn loại phân tích
-        analysis_type = st.radio(
-            "Chọn loại phân tích:",
-            ["Hồi quy một đặc trưng", "Hồi quy nhiều đặc trưng"],
-            horizontal=True
-        )
-
-        # Gọi phương thức phân tích tương ứng
-        if analysis_type == "Hồi quy một đặc trưng":
-            self._single_feature_regression()
-        else:
-            self._multi_feature_regression()
-
-        # Hiển thị biểu mẫu dự đoán
-        self._show_prediction_form()

@@ -66,14 +66,6 @@ class PhanTichVaDuDoan:
 
         st.pyplot(plt.gcf())
 
-
-
-
-
-
-
-
-
     def hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(self, dac_trung, du_lieu):
         model = LinearRegression()
         dau_vao_df = du_lieu[dac_trung].values.reshape(-1, 1)
@@ -115,7 +107,7 @@ class PhanTichVaDuDoan:
         
         loss = self.tinh_rmse(chi_phi_thuc_te_df, chi_phi_duoc_uoc_tinh)
         for i, dac_trung_don in enumerate(dac_trung):
-            fig = px.scatter(du_lieu, x=dac_trung_don, y='charges', color='smoker', title=f'{dac_trung_don} vs Charges')
+            fig = px.scatter(du_lieu, x=dac_trung_don, y='charges', color='smoker', color_discrete_sequence=['red','blue'], title=f'{dac_trung_don} vs Charges')
             
             a = model.coef_[i]
             b = model.intercept_

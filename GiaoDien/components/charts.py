@@ -35,7 +35,7 @@ class ChartsComponent:
                 fig_charges_sex = self.truc_quan_hoa.ve_bieu_do_histogram(
                     cot_gia_tri='charges',
                     mau_phan_loai='sex',
-                    mau_cu_the=['blue', 'red'],
+                    mau_cu_the=['red', 'blue'],
                     title='Các khoản phí khác nhau về giới tính'
                 )
                 st.plotly_chart(fig_charges_sex, use_container_width=True, key="hist_charges_sex")
@@ -73,6 +73,7 @@ class ChartsComponent:
                 fig_smoker_sex = self.truc_quan_hoa.ve_bieu_do_histogram(
                     cot_gia_tri='smoker',
                     mau_phan_loai='sex',
+                    mau_cu_the=['red', 'blue'],
                     title='Số lượng hút thuốc và không hút thuốc theo nam và nữ'
                 )
                 st.plotly_chart(fig_smoker_sex, use_container_width=True, key="hist_smoker_sex")
@@ -94,24 +95,25 @@ class ChartsComponent:
                     cot_gia_tri='bmi',
                     cot_nhom='charges',
                     mau_phan_loai='smoker',
+                    mau_cu_the=['red', 'blue'],
                     do_mo=0.8,
                     du_lieu_them=['sex'],
                     title='Chi phí so với BMI'
                 )
                 st.plotly_chart(fig_bmi_charges, use_container_width=True, key="scatter_bmi_charges")
-                
+
             with col2:
                 # Biểu đồ scatter tuổi và chi phí
                 fig_age_charges = self.truc_quan_hoa.ve_bieu_do_scatter(
                     cot_gia_tri='age',
                     cot_nhom='charges',
                     mau_phan_loai='smoker',
+                    mau_cu_the=['red', 'blue'],
                     do_mo=0.8,
                     du_lieu_them=['sex'],
                     title='Chi phí so với độ tuổi'
                 )
                 st.plotly_chart(fig_age_charges, use_container_width=True, key="scatter_age_charges")
-
 
         with tab3:
             col1, col2 = st.columns(2)
