@@ -1,38 +1,43 @@
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 class XuLyDuLieu:
+    """
+    Class thực hiện các thao tác xử lý dữ liệu cơ bản.
+    """
     def __init__(self, du_lieu):
         self.du_lieu = du_lieu
-
-    def thong_ke_mo_ta(self):
-        return self.du_lieu.describe()
-
-    def phan_tich_tuong_quan(self):
-        numeric_cols = self.du_lieu.select_dtypes(include=[np.number]).columns
-        return self.du_lieu[numeric_cols].corr()
-
-    def loc_du_lieu(self, column, value, operator="equals"):
-        if operator == "equals":
-            return self.du_lieu[self.du_lieu[column] == value]
-        elif operator == "greater":
-            return self.du_lieu[self.du_lieu[column] > value]
-        elif operator == "less":
-            return self.du_lieu[self.du_lieu[column] < value]
+        
+    def chuan_hoa_du_lieu(self, cot_so):
+        """
+        Chuẩn hóa dữ liệu số về khoảng [0,1]
+        Args:
+            cot_so: List các cột số cần chuẩn hóa
+        Returns:
+            DataFrame đã chuẩn hóa
+        """
+        scaler = StandardScaler()
+        self.du_lieu[cot_so] = scaler.fit_transform(self.du_lieu[cot_so])
         return self.du_lieu
-
-    def them_ban_ghi(self, new_record):
-        new_record_df = pd.DataFrame([new_record])
-        self.du_lieu = pd.concat([self.du_lieu, new_record_df], ignore_index=True)
-        return "Đã thêm bản ghi mới thành công!"
-
-    def cap_nhat_ban_ghi(self, index, column, new_value):
-        self.du_lieu.at[index, column] = new_value
-        return f"Đã cập nhật {column} tại index {index} thành {new_value}"
-
-    def xoa_ban_ghi(self, index):
-        self.du_lieu = self.du_lieu.drop(index).reset_index(drop=True)
-        return "Đã xóa bản ghi thành công!"
-
-    def sap_xep_du_lieu(self, column, ascending=True):
-        self.du_lieu = self.du_lieu.sort_values(by=column, ascending=ascending)
+    
+    def xu_ly_du_lieu_thieu(self, phuong_phap='mean'):
+        """
+        Xử lý dữ liệu thiếu bằng các phương pháp khác nhau
+        Args:
+            phuong_phap: Phương pháp xử lý ('mean', 'median', 'mode', 'drop')
+        Returns:
+            DataFrame đã xử lý dữ liệu thiếu
+        """
+        if phuong_phap == 'drop':
+            self.du_lieu = self.du_lieu.dropna()
+        else:
+            for column in self.du_lieu.columns:
+                if self.du_lieu[column].isnull().any():
+                    if phuong_phap == 'mean':
+                        self.du_lieu[column].fillna(self.du_lieu[column].mean(), inplace=True)
+                    elif phuong_phap == 'median':
+                        self.du_lieu[column].fillna(self.du_lieu[column].median(), inplace=True)
+                    elif phuong_phap == 'mode':
+                        self.du_lieu[column].fillna(self.du_lieu[column].mode()[0], inplace=True)
+        return self.du_lieu
