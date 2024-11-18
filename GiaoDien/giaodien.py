@@ -6,7 +6,7 @@ from .components.change_history import ChangeHistoryComponent
 from .components.crud_form import CRUDFormComponent
 from .components.charts import ChartsComponent
 from .components.regression import RegressionComponent
-import random  # Thêm import random
+import random
 
 class GiaoDien:
     def __init__(self, truc_quan_hoa, du_lieu, phan_tich_va_du_doan):

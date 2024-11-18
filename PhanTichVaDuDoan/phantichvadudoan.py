@@ -1,10 +1,8 @@
 ﻿import matplotlib.pyplot as plt
 import plotly.express as px
-import seaborn as sns
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import SGDRegressor
 import streamlit as st
 
 class PhanTichVaDuDoan:

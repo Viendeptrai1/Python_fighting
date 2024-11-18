@@ -1,7 +1,4 @@
 import streamlit as st
-import plotly.express as px
-import numpy as np
-import pandas as pd
 
 class RegressionComponent:
     def __init__(self, phan_tich_va_du_doan):
