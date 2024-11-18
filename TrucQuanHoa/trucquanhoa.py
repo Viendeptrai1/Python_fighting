@@ -13,7 +13,6 @@ class TrucQuanHoa:
             du_lieu: DataFrame chứa dữ liệu cần trực quan hóa
         """
         self.du_lieu = du_lieu
-        plt.style.use('default')  
         sns.set_style("whitegrid")  
 
     def ve_bieu_do_histogram(self, cot_gia_tri, cot_nhom=None,

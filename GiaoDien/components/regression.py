@@ -7,7 +7,7 @@ class RegressionComponent:
     def __init__(self, phan_tich_va_du_doan):
         self.phan_tich_va_du_doan = phan_tich_va_du_doan
 
-    def ve_hoi_quy(self):
+    def ve_hoi_quy_va_du_doan(self):
         st.write("### 🔍 Phân tích hồi quy")
         
         analysis_type = st.radio(
@@ -112,7 +112,6 @@ class RegressionComponent:
                 except Exception as e:
                     st.error(f"Lỗi khi thực hiện phân tích: {str(e)}")
                     
-
     def _multi_feature_regression(self):
         if st.button("Thực hiện phân tích"):
             try:
