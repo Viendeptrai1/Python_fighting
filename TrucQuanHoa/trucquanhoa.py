@@ -26,7 +26,7 @@ class TrucQuanHoa:
             y=cot_nhom,
             marginal=bien,
             color=mau_phan_loai,
-            nbins=so_khoang or 30,
+            nbins=so_khoang or None,
             color_discrete_sequence=mau_cu_the,
             title=title or f'Histogram của {cot_gia_tri}'
         )

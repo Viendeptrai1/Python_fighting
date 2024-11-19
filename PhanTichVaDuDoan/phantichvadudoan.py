@@ -188,4 +188,3 @@ class PhanTichVaDuDoan:
     
         # Trả về kết quả dự đoán
         return float(prediction[0])
-

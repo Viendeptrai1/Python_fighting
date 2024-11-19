@@ -141,8 +141,8 @@ class ChartsComponent:
                     cot_gia_tri='sex',
                     cot_nhom='charges',
                     mau_phan_loai='region',
-                    nhan_x='Tổng chi phí',
-                    nhan_y='Giới tính',
+                    nhan_y='Tổng chi phí',
+                    nhan_x='Giới tính',
                     title='Chi phí so với vùng theo giới tính'
                 )
                 st.plotly_chart(fig_sex_region, use_container_width=True, key="hist_sex_region")
