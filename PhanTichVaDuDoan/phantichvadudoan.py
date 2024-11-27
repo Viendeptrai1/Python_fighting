@@ -1,5 +1,5 @@
-﻿import matplotlib.pyplot as plt
-import plotly.express as px
+﻿import plotly.express as px
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
@@ -28,7 +28,7 @@ class PhanTichVaDuDoan:
         return rmse
 
     def hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(self, dac_trung, du_lieu, a, b):
-        """Phiên bản không sử dụng form của hàm hồi quy"""
+        """Thực hiện hồi quy tuyến tính bằng thủ công"""
         def uoc_tinh_chi_phi(tmp, a, b):
             return a * tmp + b 
 
@@ -42,7 +42,7 @@ class PhanTichVaDuDoan:
         chi_phi_thuc_te_df = du_lieu['charges']
         chi_phi_duoc_uoc_tinh = uoc_tinh_chi_phi(dau_vao_df, a, b)
 
-        plt.close('all')  # Đóng không gian vẽ cũ
+        plt.close('all')  
         plt.figure(figsize=(10, 6))
 
         # Vẽ biểu đồ
@@ -63,14 +63,6 @@ class PhanTichVaDuDoan:
                 verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
 
         st.pyplot(plt.gcf())
-
-
-
-
-
-
-
-
 
     def hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(self, dac_trung, du_lieu):
         model = LinearRegression()
@@ -113,7 +105,7 @@ class PhanTichVaDuDoan:
         
         loss = self.tinh_rmse(chi_phi_thuc_te_df, chi_phi_duoc_uoc_tinh)
         for i, dac_trung_don in enumerate(dac_trung):
-            fig = px.scatter(du_lieu, x=dac_trung_don, y='charges', color='smoker', title=f'{dac_trung_don} vs Charges')
+            fig = px.scatter(du_lieu, x=dac_trung_don, y='charges', color='smoker', color_discrete_sequence=['red','blue'], title=f'{dac_trung_don} vs Charges')
             
             a = model.coef_[i]
             b = model.intercept_
@@ -194,63 +186,3 @@ class PhanTichVaDuDoan:
     
         # Trả về kết quả dự đoán
         return float(prediction[0])
-
-    def du_doan_batch(self, input_data_list):
-        """
-        Dự đoán giá bảo hiểm cho nhiều người dùng cùng lúc.
-    
-        Args:
-            input_data_list (list): List các dictionary chứa thông tin người dùng
-        
-        Returns:
-            list: Danh sách các giá bảo hiểm dự đoán
-        """
-        predictions = []
-        for input_data in input_data_list:
-            try:
-                prediction = self.du_doan(input_data)
-                predictions.append(prediction)
-            except Exception as e:
-                predictions.append(None)
-                st.warning(f"Lỗi khi dự đoán cho dữ liệu {input_data}: {str(e)}")
-    
-        return predictions
-
-    def xuat_bao_cao_du_doan(self, input_data, prediction):
-        """
-        Tạo báo cáo chi tiết về dự đoán.
-    
-        Args:
-            input_data (dict): Dữ liệu đầu vào
-            prediction (float): Giá trị dự đoán
-        
-        Returns:
-            str: Báo cáo chi tiết
-        """
-        report = """
-        📊 BÁO CÁO DỰ ĐOÁN GIÁ BẢO HIỂM
-        ================================
-    
-        👤 Thông tin người dùng:
-        - Tuổi: {age} tuổi
-        - Giới tính: {sex}
-        - BMI: {bmi:.1f}
-        - Số con: {children}
-        - Hút thuốc: {smoker}
-        - Khu vực: {region}
-    
-        💰 Giá bảo hiểm dự đoán: ${prediction:,.2f}
-    
-        ⚠️ Lưu ý: Đây chỉ là dự đoán dựa trên mô hình thống kê
-        và có thể khác với giá thực tế.
-        """.format(
-            age=input_data['age'],
-            sex='Nam' if input_data['sex'] == 'male' else 'Nữ',
-            bmi=input_data['bmi'],
-            children=input_data['children'],
-            smoker='Có' if input_data['smoker'] == 'yes' else 'Không',
-            region=input_data['region'],
-            prediction=prediction
-        )
-    
-        return report
