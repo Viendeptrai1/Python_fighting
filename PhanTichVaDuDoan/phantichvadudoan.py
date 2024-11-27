@@ -1,10 +1,8 @@
-﻿import matplotlib.pyplot as plt
-import plotly.express as px
-import seaborn as sns
+﻿import plotly.express as px
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import SGDRegressor
 import streamlit as st
 
 class PhanTichVaDuDoan:
@@ -44,7 +42,7 @@ class PhanTichVaDuDoan:
         chi_phi_thuc_te_df = du_lieu['charges']
         chi_phi_duoc_uoc_tinh = uoc_tinh_chi_phi(dau_vao_df, a, b)
 
-        plt.close('all')  # Đóng không gian vẽ cũ
+        plt.close('all')  
         plt.figure(figsize=(10, 6))
 
         # Vẽ biểu đồ
