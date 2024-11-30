@@ -15,13 +15,18 @@ class TrucQuanHoa:
         self.du_lieu = du_lieu
         sns.set_style("whitegrid")  
 
-    def ve_bieu_do_histogram(self, cot_gia_tri, cot_nhom=None,
-                           nhan_x=None, nhan_y=None, chu_thich=None,
-                           bien=None, mau_cu_the=None, so_khoang=None, 
-                           mau_phan_loai=None, title=None):
-        """Vẽ biểu đồ histogram"""
+    def cap_nhat_du_lieu(self, du_lieu_moi):
+        """Cập nhật dữ liệu mới cho việc trực quan hóa"""
+        self.du_lieu = du_lieu_moi
+        
+    def ve_bieu_do_histogram(self, du_lieu=None, cot_gia_tri=None, 
+                           cot_nhom=None, nhan_x=None, nhan_y=None, 
+                           chu_thich=None, bien=None, mau_cu_the=None, 
+                           so_khoang=None, mau_phan_loai=None, title=None):
+        """Vẽ biểu đồ histogram với dữ liệu tùy chọn"""
+        data = du_lieu if du_lieu is not None else self.du_lieu
         fig = px.histogram(
-            self.du_lieu,
+            data,
             x=cot_gia_tri,
             y=cot_nhom,
             marginal=bien,
@@ -38,13 +43,14 @@ class TrucQuanHoa:
         )
         return fig
 
-    def ve_bieu_do_scatter(self, cot_gia_tri, cot_nhom, du_lieu=None,
-                          mau_cu_the=None, mau_phan_loai=None, do_mo=None, du_lieu_them=None, title=None):
-        """Vẽ biểu đồ scatter"""
-        if du_lieu is None:
-            du_lieu = self.du_lieu
+    def ve_bieu_do_scatter(self, du_lieu=None, cot_gia_tri=None, 
+                      cot_nhom=None, mau_cu_the=None, 
+                      mau_phan_loai=None, do_mo=None, 
+                      du_lieu_them=None, title=None):
+        """Vẽ biểu đồ scatter với dữ liệu tùy chọn"""
+        data = du_lieu if du_lieu is not None else self.du_lieu
         fig = px.scatter(
-            du_lieu,
+            data,
             x=cot_gia_tri,
             y=cot_nhom,
             color=mau_phan_loai,
@@ -56,10 +62,12 @@ class TrucQuanHoa:
         fig.update_traces(marker=dict(size=5, symbol='circle'))
         return fig
 
-    def ve_bieu_do_violin(self, cot_gia_tri, cot_nhom, title=None):
-        """Vẽ biểu đồ violin"""
+    def ve_bieu_do_violin(self, du_lieu=None, cot_gia_tri=None, 
+                     cot_nhom=None, title=None):
+        """Vẽ biểu đồ violin với dữ liệu tùy chọn"""
+        data = du_lieu if du_lieu is not None else self.du_lieu
         fig = px.violin(
-            self.du_lieu,
+            data,
             x=cot_gia_tri,
             y=cot_nhom,
             title=title or f'Phân phối chi tiết {cot_gia_tri} theo {cot_nhom}'
