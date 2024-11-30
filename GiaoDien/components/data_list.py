@@ -138,7 +138,7 @@ class DataListComponent:
             def format_data(val):
                 if isinstance(val, (int, float)):
                     if isinstance(val, float):
-                        return f"{val:,.2f}"
+                        return f"{val:,.4f}"
                     return f"{val:,}"
                 return val
 

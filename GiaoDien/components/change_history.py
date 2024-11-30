@@ -49,31 +49,53 @@ class ChangeHistoryComponent:
 
     def _display_added_record(self, data):
         """Hiển thị bản ghi mới thêm"""
+        # Đảm bảo thứ tự cột giống nhau
+        columns = ['ID', 'age', 'sex', 'bmi', 'children', 'smoker', 'region', 'charges']
+        
+        def format_data(val):
+            if isinstance(val, (int, float)):
+                if isinstance(val, float):
+                    return f"{val:,.4f}"
+                return f"{val:,}"
+            return val
+        
+        df = pd.DataFrame([data])[columns]
         st.dataframe(
-            pd.DataFrame([data]).style.apply(
+            df.style.apply(
                 lambda _: ['background-color: lightgreen'] * len(data),
                 axis=1
-            ),
+            ).format(format_data),
             hide_index=True
         )
 
     def _display_updated_record(self, old_data, new_data):
         """Hiển thị bản ghi được cập nhật"""
+        # Đảm bảo thứ tự cột giống nhau
+        columns = ['ID', 'age', 'sex', 'bmi', 'children', 'smoker', 'region', 'charges']
+        
+        def format_data(val):
+            if isinstance(val, (int, float)):
+                if isinstance(val, float):
+                    return f"{val:,.4f}"
+                return f"{val:,}"
+            return val
+        
         st.write("Old values:")
-        st.dataframe(pd.DataFrame([old_data]), hide_index=True)
+        old_df = pd.DataFrame([old_data])[columns]
+        st.dataframe(old_df.style.format(format_data), hide_index=True)
         
         st.write("New values:")
-        df = pd.DataFrame([new_data])
+        new_df = pd.DataFrame([new_data])[columns]
         
         def highlight_changes(row):
             return [
                 'background-color: lightyellow' 
                 if old_data.get(col) != new_data.get(col) else ''
-                for col in df.columns
+                for col in new_df.columns
             ]
         
         st.dataframe(
-            df.style.apply(highlight_changes, axis=1),
+            new_df.style.apply(highlight_changes, axis=1).format(format_data),
             hide_index=True
         )
 

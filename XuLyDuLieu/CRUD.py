@@ -25,6 +25,11 @@ class CRUD:
             raise ValueError("Smoker phải là 'yes' hoặc 'no'")
         if record.get('region') not in ['southwest', 'southeast', 'northwest', 'northeast']:
             raise ValueError("Region không hợp lệ")
+        if not isinstance(record.get('charges'), (int, float)) or record['charges'] < 0:
+            raise ValueError("Chi phí bảo hiểm phải là số không âm")
+        
+        # Chuyển đổi charges về float với 4 chữ số thập phân
+        record['charges'] = float(format(record['charges'], '.4f'))
 
     def them(self, record: Dict) -> pd.DataFrame:
         """Thêm bản ghi mới và trả về DataFrame đã cập nhật"""

@@ -91,8 +91,10 @@ class GiaoDien:
             data = self.du_lieu.lay()
             if data is not None:
                 st.session_state.original_data = data.copy()
-                # Thêm cột ID cho dữ liệu gốc
-                st.session_state.original_data.insert(0, 'ID', range(1, len(st.session_state.original_data) + 1))
+                
+                # Kiểm tra và thêm cột ID nếu chưa tồn tại
+                if 'ID' not in st.session_state.original_data.columns:
+                    st.session_state.original_data.insert(0, 'ID', range(1, len(st.session_state.original_data) + 1))
                 
                 # Khởi tạo các session state khác
                 st.session_state.modified_data = st.session_state.original_data.copy()

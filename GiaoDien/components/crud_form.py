@@ -1,12 +1,14 @@
 import streamlit as st
 from XuLyDuLieu.CRUD import CRUD
 from .change_history import ChangeHistoryComponent
-
+import time
 class CRUDFormComponent:
     def __init__(self, session_state):
         self.session_state = session_state
         self.crud = CRUD(self.session_state.modified_data)
         self.change_history = ChangeHistoryComponent(session_state)
+        if 'show_success_message' not in self.session_state:
+            self.session_state.show_success_message = None
 
     def quan_ly(self):
         st.header("Create/Update/Delete Data")
@@ -18,6 +20,50 @@ class CRUDFormComponent:
             self._update_record()
         else:  # Delete Multiple
             self._delete_records()
+
+        # Thêm trạng thái xác nhận vào session state nếu chưa có
+        if 'confirm_save' not in st.session_state:
+            st.session_state.confirm_save = False
+            
+        # Nút lưu chính
+        if st.button("Lưu vào dữ liệu gốc"):
+            st.session_state.confirm_save = True
+            
+        # Hiển thị dialog xác nhận khi đã bấm nút lưu
+        if st.session_state.confirm_save:
+            st.warning("⚠️ Bạn có chắc muốn lưu các thay đổi vào dữ liệu gốc?")
+            
+            col1, col2 = st.columns([1,1])
+            
+            with col1:
+                if st.button("✔️ Xác nhận"):
+                    try:
+                        # Cập nhật dữ liệu gốc
+                        st.session_state.du_lieu.du_lieu = st.session_state.modified_data
+                        st.session_state.du_lieu.luu()
+                        
+                        # Cập nhật session state
+                        st.session_state.original_data = st.session_state.modified_data.copy()
+                        
+                        # Hiển thị thông báo thành công
+                        st.success("✅ Đã lưu thành công vào dữ liệu gốc!")
+                        
+                        # Reset trạng thái xác nhận
+                        st.session_state.confirm_save = False
+                        
+                        # Tự động refresh sau 2s
+                        time.sleep(2)
+                        st.rerun()
+                        
+                    except Exception as e:
+                        st.error(f"❌ Lỗi khi lưu dữ liệu: {str(e)}")
+                        st.session_state.confirm_save = False
+                        
+            with col2:
+                if st.button("❌ Hủy"):
+                    st.session_state.confirm_save = False
+                    st.rerun()
+                    
 
     def _create_new_record(self):
         with st.form("create_form"):
@@ -32,7 +78,7 @@ class CRUDFormComponent:
                 children = st.number_input("Number of Children", min_value=0, max_value=10, value=0)
                 region = st.selectbox("Region", ["southeast", "southwest", "northeast", "northwest"])
 
-            charges = st.number_input("Charges", min_value=0.0, value=5000.0, step=100.0)
+            charges = st.number_input("Charges", min_value=0.0, value=5000.0, step=100.0, format="%.4f")
             submitted = st.form_submit_button("Add Record")
 
         if submitted:
@@ -55,7 +101,8 @@ class CRUDFormComponent:
                     data=new_record
                 )
                 
-                st.success("Thêm bản ghi mới thành công!")
+                self.session_state.show_success_message = "Thêm bản ghi mới thành công!"
+                self._show_success_message("Thêm bản ghi mới thành công!")
                 
             except Exception as e:
                 st.error(f"Lỗi khi thêm bản ghi: {str(e)}")
@@ -111,8 +158,8 @@ class CRUDFormComponent:
                         old_data=old_record,
                         new_data=updated_record
                     )
-                    
-                    st.success("Cập nhật bản ghi thành công!")
+                    self.session_state.show_success_message = "Cập nhật bản ghi thành công!"
+                    self._show_success_message("Cập nhật bản ghi thành công!")
                     
                 except Exception as e:
                     st.error(f"Lỗi khi cập nhật bản ghi: {str(e)}")
@@ -139,9 +186,20 @@ class CRUDFormComponent:
                     new_df = self.crud.xoa(selected_indices)
                     self.session_state.modified_data = new_df
                     
-                    st.success(f"Đã xóa {len(selected_indices)} bản ghi!")
+                    self.session_state.show_success_message = f"Đã xóa {len(selected_indices)} bản ghi!"
+                    self._show_success_message(f"Đã xóa {len(selected_indices)} bản ghi!")
                     
                 except Exception as e:
                     st.error(f"Lỗi khi xóa bản ghi: {str(e)}")
             else:
                 st.warning("Vui lòng chọn ít nhất một bản ghi để xóa.")
+
+    def _show_success_message(self, message):
+        if self.session_state.show_success_message == message:
+            col1, col2 = st.columns([10,1])
+            with col1:
+                st.success(message)
+            with col2:
+                if st.button("✖"):
+                    self.session_state.show_success_message = None
+                    st.rerun()
