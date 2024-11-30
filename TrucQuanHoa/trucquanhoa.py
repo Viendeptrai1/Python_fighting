@@ -13,7 +13,6 @@ class TrucQuanHoa:
             du_lieu: DataFrame chứa dữ liệu cần trực quan hóa
         """
         self.du_lieu = du_lieu
-        plt.style.use('default')  
         sns.set_style("whitegrid")  
 
     def ve_bieu_do_histogram(self, cot_gia_tri, cot_nhom=None,
@@ -27,7 +26,7 @@ class TrucQuanHoa:
             y=cot_nhom,
             marginal=bien,
             color=mau_phan_loai,
-            nbins=so_khoang or 30,
+            nbins=so_khoang or None,
             color_discrete_sequence=mau_cu_the,
             title=title or f'Histogram của {cot_gia_tri}'
         )
