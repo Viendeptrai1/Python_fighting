@@ -146,4 +146,4 @@ class GiaoDien:
         elif menu == "Charts":
             self.charts.ve_bieu_do()
         elif menu == "Xem hồi quy":
-            self.regression.ve_hoi_quy()
+            self.regression.ve_hoi_quy_va_du_doan()
