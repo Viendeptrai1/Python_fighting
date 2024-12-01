@@ -185,9 +185,6 @@ class PhanTichVaDuDoan:
         prediction = model.predict(input_df_encoded)
     
         # Trả về kết quả dự đoán
-<<<<<<< HEAD
-        return float(prediction[0])
-=======
         return float(prediction[0])
 
     def du_doan_batch(self, input_data_list):
@@ -249,4 +246,3 @@ class PhanTichVaDuDoan:
         )
     
         return report
->>>>>>> 6ed2292114bb338b9a3d7e027025d4e4bb3aa04a
