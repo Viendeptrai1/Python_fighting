@@ -69,7 +69,7 @@ class CRUDFormComponent:
         with st.form("create_form"):
             cols = st.columns(3)
             with cols[0]:
-                age = st.number_input("Age", min_value=18, max_value=100, value=30)
+                age = st.number_input("Age", min_value=0, max_value=100, value=30)
                 bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=25.0)
             with cols[1]:
                 sex = st.selectbox("Sex", ["male", "female"])
