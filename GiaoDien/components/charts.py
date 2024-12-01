@@ -6,12 +6,30 @@ class ChartsComponent:
         self.du_lieu = du_lieu
 
     def ve_bieu_do(self):
-        data = self.du_lieu.lay()
+        st.header("Phân tích trực quan dữ liệu")
+        
+        # Thêm radio button để chọn nguồn dữ liệu
+        data_source = st.radio(
+            "Chọn nguồn dữ liệu:",
+            ["Dữ liệu gốc", "Dữ liệu đã chỉnh sửa"],
+            horizontal=True
+        )
+        
+        # Lấy dữ liệu tương ứng
+        if data_source == "Dữ liệu gốc":
+            data = st.session_state.original_data
+        else:
+            data = st.session_state.modified_data
+            
+        # Cập nhật dữ liệu cho TrucQuanHoa
+        self.truc_quan_hoa.cap_nhat_du_lieu(data)
+        
         if data is None:
             st.error("Không có dữ liệu để vẽ biểu đồ")
             return
 
-        st.header("Phân tích trực quan dữ liệu")
+        # Hiển thị thông tin về dữ liệu đang sử dụng
+        st.info(f"Đang sử dụng {data_source} với {len(data)} bản ghi")
 
         tab1, tab2, tab3 = st.tabs([
             "Phân bố chi phí y tế theo các yếu tố",
@@ -153,3 +171,18 @@ class ChartsComponent:
                     title='Ma trận tương quan'
                 )
                 st.pyplot(fig_corr)
+
+    def ve_bieu_do_so_sanh(self):
+        """Vẽ biểu đồ so sánh giữa dữ liệu gốc và dữ liệu đã chỉnh sửa"""
+        if st.checkbox("So sánh với dữ liệu gốc"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.subheader("Dữ liệu gốc")
+                self.truc_quan_hoa.cap_nhat_du_lieu(st.session_state.original_data)
+                self.ve_bieu_do_chi_tiet()
+                
+            with col2:
+                st.subheader("Dữ liệu đã chỉnh sửa")
+                self.truc_quan_hoa.cap_nhat_du_lieu(st.session_state.modified_data)
+                self.ve_bieu_do_chi_tiet()

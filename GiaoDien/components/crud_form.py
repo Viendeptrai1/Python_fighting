@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from XuLyDuLieu.CRUD import CRUD
 from .change_history import ChangeHistoryComponent
 

@@ -1,5 +1,5 @@
 ﻿import pandas as pd
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List
 
 class CRUD:
     def __init__(self, df: pd.DataFrame):

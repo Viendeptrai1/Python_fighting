@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 
 class DataListComponent:
     def __init__(self, session_state):
