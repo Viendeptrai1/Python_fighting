@@ -29,42 +29,42 @@ class PhanTichVaDuDoan:
         rmse = np.sqrt(trung_binh_sai_so_binh_phuong)
         return rmse
 
-    def hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(self, dac_trung, du_lieu, a, b):
-        """Thực hiện hồi quy tuyến tính bằng thủ công"""
-        def uoc_tinh_chi_phi(tmp, a, b):
-            return a * tmp + b 
+    # def hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(self, dac_trung, du_lieu, a, b):
+    #     """Thực hiện hồi quy tuyến tính bằng thủ công"""
+    #     def uoc_tinh_chi_phi(tmp, a, b):
+    #         return a * tmp + b 
 
-        # Kiểm tra dữ liệu đầu vào
-        if dac_trung not in du_lieu.columns:
-            raise ValueError(f"Đặc trưng '{dac_trung}' không tồn tại trong dữ liệu.")
-        if du_lieu.empty:
-            raise ValueError("Dữ liệu trống.")
+    #     # Kiểm tra dữ liệu đầu vào
+    #     if dac_trung not in du_lieu.columns:
+    #         raise ValueError(f"Đặc trưng '{dac_trung}' không tồn tại trong dữ liệu.")
+    #     if du_lieu.empty:
+    #         raise ValueError("Dữ liệu trống.")
 
-        dau_vao_df = du_lieu[dac_trung]
-        chi_phi_thuc_te_df = du_lieu['charges']
-        chi_phi_duoc_uoc_tinh = uoc_tinh_chi_phi(dau_vao_df, a, b)
+    #     dau_vao_df = du_lieu[dac_trung]
+    #     chi_phi_thuc_te_df = du_lieu['charges']
+    #     chi_phi_duoc_uoc_tinh = uoc_tinh_chi_phi(dau_vao_df, a, b)
 
-        plt.close('all')  
-        plt.figure(figsize=(10, 6))
+    #     plt.close('all')  
+    #     plt.figure(figsize=(10, 6))
 
-        # Vẽ biểu đồ
-        plt.plot(dau_vao_df, chi_phi_duoc_uoc_tinh, 'r', alpha=0.9)
-        plt.scatter(dau_vao_df, chi_phi_thuc_te_df, s=8, alpha=0.8)
-        plt.xlabel(dac_trung)
-        plt.ylabel('Charges')
-        plt.legend(['Estimate', 'Actual'])
+    #     # Vẽ biểu đồ
+    #     plt.plot(dau_vao_df, chi_phi_duoc_uoc_tinh, 'r', alpha=0.9)
+    #     plt.scatter(dau_vao_df, chi_phi_thuc_te_df, s=8, alpha=0.8)
+    #     plt.xlabel(dac_trung)
+    #     plt.ylabel('Charges')
+    #     plt.legend(['Estimate', 'Actual'])
 
-        equation_text = f'y = {a:.2f} * x + {b:.2f}' if b > 0 else f'y = {a:.2f} * x {b:.2f}'
-        plt.text(0.05, 0.90, equation_text, 
-                transform=plt.gca().transAxes, fontsize=12, 
-                verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
+    #     equation_text = f'y = {a:.2f} * x + {b:.2f}' if b > 0 else f'y = {a:.2f} * x {b:.2f}'
+    #     plt.text(0.05, 0.90, equation_text, 
+    #             transform=plt.gca().transAxes, fontsize=12, 
+    #             verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
 
-        loss = self.tinh_rmse(chi_phi_thuc_te_df, chi_phi_duoc_uoc_tinh)
-        plt.text(0.05, 0.95, f'RMSE Loss: {loss:.2f}',
-                transform=plt.gca().transAxes, fontsize=12, 
-                verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
+    #     loss = self.tinh_rmse(chi_phi_thuc_te_df, chi_phi_duoc_uoc_tinh)
+    #     plt.text(0.05, 0.95, f'RMSE Loss: {loss:.2f}',
+    #             transform=plt.gca().transAxes, fontsize=12, 
+    #             verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
 
-        st.pyplot(plt.gcf())
+    #     st.pyplot(plt.gcf())
 
     def hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(self, dac_trung, du_lieu, phuong_phap_chuan_hoa='standard'):
         model = LinearRegression()
