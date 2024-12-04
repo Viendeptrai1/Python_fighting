@@ -29,8 +29,11 @@ class PhanTichVaDuDoan:
         rmse = np.sqrt(trung_binh_sai_so_binh_phuong)
         return rmse
 
-    def hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(self, dac_trung, du_lieu, a, b):
+    def hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(self, dac_trung, du_lieu, a, b, phuong_phap_chuan_hoa='standard'):
         """Thực hiện hồi quy tuyến tính bằng thủ công"""
+        # Chuẩn hóa dữ liệu
+        du_lieu_da_xu_ly = self.tien_xu_ly.chuan_hoa_du_lieu(du_lieu, phuong_phap_chuan_hoa)
+        
         def uoc_tinh_chi_phi(tmp, a, b):
             return a * tmp + b 
 
@@ -40,16 +43,16 @@ class PhanTichVaDuDoan:
         if du_lieu.empty:
             raise ValueError("Dữ liệu trống.")
 
-        dau_vao_df = du_lieu[dac_trung]
+        dau_vao_df = du_lieu_da_xu_ly[dac_trung]
         chi_phi_thuc_te_df = du_lieu['charges']
         chi_phi_duoc_uoc_tinh = uoc_tinh_chi_phi(dau_vao_df, a, b)
 
         plt.close('all')  
         plt.figure(figsize=(10, 6))
 
-        # Vẽ biểu đồ
-        plt.plot(dau_vao_df, chi_phi_duoc_uoc_tinh, 'r', alpha=0.9)
-        plt.scatter(dau_vao_df, chi_phi_thuc_te_df, s=8, alpha=0.8)
+        # Vẽ biểu đồ với dữ liệu gốc
+        plt.plot(du_lieu[dac_trung], chi_phi_duoc_uoc_tinh, 'r', alpha=0.9)
+        plt.scatter(du_lieu[dac_trung], chi_phi_thuc_te_df, s=8, alpha=0.8)
         plt.xlabel(dac_trung)
         plt.ylabel('Charges')
         plt.legend(['Estimate', 'Actual'])
