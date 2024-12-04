@@ -60,13 +60,6 @@ class RegressionComponent:
         else:
             du_lieu = self.phan_tich_va_du_doan.du_lieu
         
-        # Chọn phương pháp chuẩn hóa trước
-        normalization_method = st.selectbox(
-            "Chọn phương pháp chuẩn hóa:",
-            ["standard", "minmax"],
-            help="Standard: chuẩn hóa về phân phối chuẩn, MinMax: chuẩn hóa về khoảng [0,1]"
-        )
-        
         is_manual = st.checkbox("Sử dụng hồi quy thủ công", 
                               help="Chọn để nhập hệ số a, b thủ công")
         
@@ -83,14 +76,12 @@ class RegressionComponent:
                     self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(
                         feature,
                         du_lieu,
-                        a, b,
-                        normalization_method
+                        a, b
                     )
                 else:
                     self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(
                         feature,
-                        du_lieu,
-                        normalization_method
+                        du_lieu
                     )
             except Exception as e:
                 st.error(f"Lỗi khi thực hiện phân tích: {str(e)}")
@@ -107,6 +98,11 @@ class RegressionComponent:
 
     def _show_prediction_form(self):
         st.write("### 🎯 Dự đoán giá bảo hiểm")
+        normalization_method = st.selectbox(
+            "Chọn phương pháp chuẩn hóa:",
+            ["standard", "minmax"],
+            help="Standard: chuẩn hóa về phân phối chuẩn, MinMax: chuẩn hóa về khoảng [0,1]"
+        )
         with st.form("prediction_form"):
             col1, col2, col3 = st.columns(3)
             
@@ -132,7 +128,7 @@ class RegressionComponent:
                         'smoker': smoker,
                         'region': region
                     }
-                    prediction = self.phan_tich_va_du_doan.du_doan(input_data)
+                    prediction = self.phan_tich_va_du_doan.du_doan(input_data, normalization_method)
                     st.success(f"Giá bảo hiểm dự đoán: ${prediction:,.2f}")
                 except Exception as e:
                     st.error(f"Lỗi khi dự đoán: {str(e)}")
