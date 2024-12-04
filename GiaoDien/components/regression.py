@@ -60,6 +60,13 @@ class RegressionComponent:
         else:
             du_lieu = self.phan_tich_va_du_doan.du_lieu
         
+        # Chọn phương pháp chuẩn hóa trước
+        normalization_method = st.selectbox(
+            "Chọn phương pháp chuẩn hóa:",
+            ["standard", "minmax"],
+            help="Standard: chuẩn hóa về phân phối chuẩn, MinMax: chuẩn hóa về khoảng [0,1]"
+        )
+        
         is_manual = st.checkbox("Sử dụng hồi quy thủ công", 
                               help="Chọn để nhập hệ số a, b thủ công")
         
@@ -69,12 +76,6 @@ class RegressionComponent:
                 a = st.number_input("Hệ số a", value=1.0)
             with col2:
                 b = st.number_input("Hệ số b", value=0.0)
-        else:
-            normalization_method = st.selectbox(
-                "Chọn phương pháp chuẩn hóa:",
-                ["standard", "minmax"],
-                help="Standard: chuẩn hóa về phân phối chuẩn, MinMax: chuẩn hóa về khoảng [0,1]"
-            )
         
         if st.button("Thực hiện phân tích"):
             try:
@@ -82,7 +83,8 @@ class RegressionComponent:
                     self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(
                         feature,
                         du_lieu,
-                        a, b
+                        a, b,
+                        normalization_method
                     )
                 else:
                     self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(
