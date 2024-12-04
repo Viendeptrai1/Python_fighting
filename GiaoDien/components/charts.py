@@ -171,18 +171,3 @@ class ChartsComponent:
                     title='Ma trận tương quan'
                 )
                 st.pyplot(fig_corr)
-
-    def ve_bieu_do_so_sanh(self):
-        """Vẽ biểu đồ so sánh giữa dữ liệu gốc và dữ liệu đã chỉnh sửa"""
-        if st.checkbox("So sánh với dữ liệu gốc"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.subheader("Dữ liệu gốc")
-                self.truc_quan_hoa.cap_nhat_du_lieu(st.session_state.original_data)
-                self.ve_bieu_do_chi_tiet()
-                
-            with col2:
-                st.subheader("Dữ liệu đã chỉnh sửa")
-                self.truc_quan_hoa.cap_nhat_du_lieu(st.session_state.modified_data)
-                self.ve_bieu_do_chi_tiet()

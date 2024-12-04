@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 import streamlit as st
+from .tien_xu_ly import TienXuLyDuLieu
 
 class PhanTichVaDuDoan:
     """
@@ -18,6 +19,7 @@ class PhanTichVaDuDoan:
           du_lieu: DataFrame chứa dữ liệu.
         """
         self.du_lieu = du_lieu
+        self.tien_xu_ly = TienXuLyDuLieu()
     
     def tinh_rmse(self, thuc_te, du_doan):
         """Tính toán Root Mean Square Error"""
@@ -64,34 +66,44 @@ class PhanTichVaDuDoan:
 
         st.pyplot(plt.gcf())
 
-    def hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(self, dac_trung, du_lieu):
+    def hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(self, dac_trung, du_lieu, phuong_phap_chuan_hoa='standard'):
         model = LinearRegression()
-        dau_vao_df = du_lieu[dac_trung].values.reshape(-1, 1)
+        
+        # Chuẩn hóa dữ liệu
+        du_lieu_da_xu_ly = self.tien_xu_ly.chuan_hoa_du_lieu(du_lieu, phuong_phap_chuan_hoa)
+        
+        dau_vao_df = du_lieu_da_xu_ly[dac_trung].values.reshape(-1, 1)
         chi_phi_thuc_te_df = du_lieu['charges']
-    
+        
         model.fit(dau_vao_df, chi_phi_thuc_te_df)
-    
         chi_phi_duoc_uoc_tinh = model.predict(dau_vao_df)
-    
+        
+        # Vẽ biểu đồ với dữ liệu gốc
         plt.figure(figsize=(10, 6))
-        plt.plot(dau_vao_df, chi_phi_duoc_uoc_tinh, 'r', alpha=0.9)
-        plt.scatter(dau_vao_df, chi_phi_thuc_te_df, s=8, alpha=0.8)
+        plt.scatter(du_lieu[dac_trung], chi_phi_thuc_te_df, s=8, alpha=0.8)
+        
+        # Sắp xếp để vẽ đường hồi quy
+        sort_idx = np.argsort(du_lieu[dac_trung])
+        plt.plot(du_lieu[dac_trung].iloc[sort_idx], 
+                chi_phi_duoc_uoc_tinh[sort_idx], 'r', alpha=0.9)
+        
         plt.xlabel(dac_trung)
         plt.ylabel('Charges')
         plt.legend(['Estimate', 'Actual'])
 
+        # Hiển thị phương trình và RMSE
         a = model.coef_[0]
         b = model.intercept_
         equation_text = f'y = {a:.2f} * x + {b:.2f}' if b > 0 else f'y = {a:.2f} * x {b:.2f}'
         plt.text(0.05, 0.90, equation_text, 
-                 transform=plt.gca().transAxes, fontsize=12, 
-                 verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
+                transform=plt.gca().transAxes, fontsize=12,
+                verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
         
         loss = self.tinh_rmse(chi_phi_thuc_te_df, chi_phi_duoc_uoc_tinh)
         plt.text(0.05, 0.95, f'RMSE Loss: {loss:.2f}',
-                 transform=plt.gca().transAxes, fontsize=12, 
-                 verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
-
+                transform=plt.gca().transAxes, fontsize=12,
+                verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
+                
         st.pyplot(plt.gcf())
 
     def hoi_quy_tuyen_tinh_nhieu_dac_trung_su_dung_ham(self, dac_trung, du_lieu):
@@ -144,38 +156,9 @@ class PhanTichVaDuDoan:
         X_train = self.du_lieu.copy()
         y_train = X_train.pop('charges')
     
-        # Tiền xử lý dữ liệu
-        # 1. Chuyển đổi categorical thành numerical
-        categorical_columns = ['sex', 'smoker', 'region']
-    
-        # Tạo bản sao để tránh ảnh hưởng đến dữ liệu gốc
-        X_train_encoded = X_train.copy()
-        input_df_encoded = input_df.copy()
-    
-        for column in categorical_columns:
-            # Lấy unique values từ cả training và input data
-            unique_values = list(set(X_train[column].unique()) | set(input_df[column].unique()))
-        
-            # Tạo mapping
-            value_to_int = {value: index for index, value in enumerate(unique_values)}
-        
-            # Áp dụng encoding
-            X_train_encoded[column] = X_train[column].map(value_to_int)
-            input_df_encoded[column] = input_df[column].map(value_to_int)
-    
-        # 2. Chuẩn hóa dữ liệu số
-        numerical_columns = ['age', 'bmi', 'children']
-    
-        # Tính mean và std từ training data
-        means = {}
-        stds = {}
-        for column in numerical_columns:
-            means[column] = X_train[column].mean()
-            stds[column] = X_train[column].std()
-        
-            # Chuẩn hóa
-            X_train_encoded[column] = (X_train[column] - means[column]) / stds[column]
-            input_df_encoded[column] = (input_df[column] - means[column]) / stds[column]
+        # Sử dụng TienXuLyDuLieu để xử lý cả training và input data
+        X_train_encoded = self.tien_xu_ly.chuan_hoa_du_lieu(X_train)
+        input_df_encoded = self.tien_xu_ly.chuan_hoa_du_lieu_moi(input_df)
     
         # Huấn luyện mô hình
         model = LinearRegression()
@@ -186,63 +169,3 @@ class PhanTichVaDuDoan:
     
         # Trả về kết quả dự đoán
         return float(prediction[0])
-
-    def du_doan_batch(self, input_data_list):
-        """
-        Dự đoán giá bảo hiểm cho nhiều người dùng cùng lúc.
-    
-        Args:
-            input_data_list (list): List các dictionary chứa thông tin người dùng
-        
-        Returns:
-            list: Danh sách các giá bảo hiểm dự đoán
-        """
-        predictions = []
-        for input_data in input_data_list:
-            try:
-                prediction = self.du_doan(input_data)
-                predictions.append(prediction)
-            except Exception as e:
-                predictions.append(None)
-                st.warning(f"Lỗi khi dự đoán cho dữ liệu {input_data}: {str(e)}")
-    
-        return predictions
-
-    def xuat_bao_cao_du_doan(self, input_data, prediction):
-        """
-        Tạo báo cáo chi tiết về dự đoán.
-    
-        Args:
-            input_data (dict): Dữ liệu đầu vào
-            prediction (float): Giá trị dự đoán
-        
-        Returns:
-            str: Báo cáo chi tiết
-        """
-        report = """
-        📊 BÁO CÁO DỰ ĐOÁN GIÁ BẢO HIỂM
-        ================================
-    
-        👤 Thông tin người dùng:
-        - Tuổi: {age} tuổi
-        - Giới tính: {sex}
-        - BMI: {bmi:.1f}
-        - Số con: {children}
-        - Hút thuốc: {smoker}
-        - Khu vực: {region}
-    
-        💰 Giá bảo hiểm dự đoán: ${prediction:,.2f}
-    
-        ⚠️ Lưu ý: Đây chỉ là dự đoán dựa trên mô hình thống kê
-        và có thể khác với giá thực tế.
-        """.format(
-            age=input_data['age'],
-            sex='Nam' if input_data['sex'] == 'male' else 'Nữ',
-            bmi=input_data['bmi'],
-            children=input_data['children'],
-            smoker='Có' if input_data['smoker'] == 'yes' else 'Không',
-            region=input_data['region'],
-            prediction=prediction
-        )
-    
-        return report

@@ -24,91 +24,25 @@ class RegressionComponent:
         feature = st.selectbox(
             "Chọn đặc trưng phân tích:",
             ["age", "bmi", "children"],
-            help="Chọn đặc trưng để phân tích mối quan hệ với giá bảo hiểm",
-            key="feature_select"
+            help="Chọn đặc trưng để phân tích mối quan hệ với giá bảo hiểm"
         )
         
-        group_type = st.selectbox(
-            "Chọn loại nhóm:",
-            ["smoker", "region"],
-            help="Chọn tiêu chí phân nhóm dữ liệu",
-            key="group_type_select"
+        normalization_method = st.selectbox(
+            "Chọn phương pháp chuẩn hóa:",
+            ["standard", "minmax"],
+            help="Standard: chuẩn hóa về phân phối chuẩn, MinMax: chuẩn hóa về khoảng [0,1]"
         )
-
-        if group_type == "smoker":
-            group_value = st.radio(
-                "Chọn nhóm đối tượng:",
-                ["Người hút thuốc", "Người không hút thuốc"],
-                horizontal=True,
-                key="smoker_group"
-            )
-        else:
-            group_value = st.radio(
-                "Chọn khu vực:",
-                ["southwest", "southeast", "northwest", "northeast"],
-                horizontal=True,
-                key="region_group"
-            )
         
-        regression_method = st.radio(
-            "Chọn phương pháp hồi quy:",
-            ["Thủ công", "Sử dụng hàm"],
-            horizontal=True,
-            key="regression_method"
-        )
-
-        if group_type == "smoker":
-            filter_value = 'yes' if group_value == "Người hút thuốc" else 'no'
-            df_filtered = self.phan_tich_va_du_doan.du_lieu[
-                self.phan_tich_va_du_doan.du_lieu['smoker'] == filter_value
-            ]
-        else:
-            df_filtered = self.phan_tich_va_du_doan.du_lieu[
-                self.phan_tich_va_du_doan.du_lieu['region'] == group_value
-            ]
-
-        if regression_method == "Thủ công":
-            if 'regression_params' not in st.session_state:
-                st.session_state.regression_params = {
-                    'a': 1.00,
-                    'b': 0.00
-                }
-
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                a = st.number_input(
-                    "Nhập hệ số a:",
-                    value=float(st.session_state.regression_params['a']),
-                    key="param_a"
+        if st.button("Thực hiện phân tích"):
+            try:
+                self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(
+                    feature, 
+                    self.phan_tich_va_du_doan.du_lieu,
+                    normalization_method
                 )
-            
-            with col2:
-                b = st.number_input(
-                    "Nhập hệ số b:",
-                    value=float(st.session_state.regression_params['b']),
-                    key="param_b"
-                )
-                
-            st.session_state.regression_params['a'] = a
-            st.session_state.regression_params['b'] = b
+            except Exception as e:
+                st.error(f"Lỗi khi thực hiện phân tích: {str(e)}")
 
-            if st.button("Vẽ biểu đồ", key="plot_button"):
-                try:
-                    self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(
-                        feature, df_filtered, a, b
-                    )
-                except Exception as e:
-                    st.error(f"Lỗi khi vẽ biểu đồ: {str(e)}")
-        else:
-            if st.button("Thực hiện phân tích", key="analyze_button"):
-                try:
-                    self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(
-                        [feature], df_filtered
-                    )
-                except Exception as e:
-                    st.error(f"Lỗi khi thực hiện phân tích: {str(e)}")
-                    
     def _multi_feature_regression(self):
         if st.button("Thực hiện phân tích"):
             try:
