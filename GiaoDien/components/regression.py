@@ -27,6 +27,39 @@ class RegressionComponent:
             help="Chọn đặc trưng để phân tích mối quan hệ với giá bảo hiểm"
         )
         
+        # Thêm lựa chọn phân nhóm
+        group_by = st.checkbox("Phân tích theo nhóm", 
+                             help="Chọn để phân tích riêng cho từng nhóm đối tượng")
+        
+        if group_by:
+            group_type = st.selectbox(
+                "Chọn loại nhóm:",
+                ["smoker", "region"],
+                help="Chọn tiêu chí phân nhóm dữ liệu"
+            )
+
+            if group_type == "smoker":
+                group_value = st.radio(
+                    "Chọn nhóm đối tượng:",
+                    ["Người hút thuốc", "Người không hút thuốc"],
+                    horizontal=True
+                )
+                filter_value = 'yes' if group_value == "Người hút thuốc" else 'no'
+                du_lieu = self.phan_tich_va_du_doan.du_lieu[
+                    self.phan_tich_va_du_doan.du_lieu['smoker'] == filter_value
+                ]
+            else:
+                group_value = st.radio(
+                    "Chọn khu vực:",
+                    ["southwest", "southeast", "northwest", "northeast"],
+                    horizontal=True
+                )
+                du_lieu = self.phan_tich_va_du_doan.du_lieu[
+                    self.phan_tich_va_du_doan.du_lieu['region'] == group_value
+                ]
+        else:
+            du_lieu = self.phan_tich_va_du_doan.du_lieu
+        
         is_manual = st.checkbox("Sử dụng hồi quy thủ công", 
                               help="Chọn để nhập hệ số a, b thủ công")
         
@@ -48,13 +81,13 @@ class RegressionComponent:
                 if is_manual:
                     self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_thu_cong(
                         feature,
-                        self.phan_tich_va_du_doan.du_lieu,
+                        du_lieu,
                         a, b
                     )
                 else:
                     self.phan_tich_va_du_doan.hoi_quy_tuyen_tinh_1_dac_trung_su_dung_ham(
                         feature,
-                        self.phan_tich_va_du_doan.du_lieu,
+                        du_lieu,
                         normalization_method
                     )
             except Exception as e:
