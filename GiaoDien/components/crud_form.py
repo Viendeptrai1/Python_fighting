@@ -69,8 +69,8 @@ class CRUDFormComponent:
         with st.form("create_form"):
             cols = st.columns(3)
             with cols[0]:
-                age = st.number_input("Age", min_value=0, max_value=100, value=30)
-                bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=25.0)
+                age = st.number_input("Age", value=30)
+                bmi = st.number_input("BMI", value=25.0)
             with cols[1]:
                 sex = st.selectbox("Sex", ["male", "female"])
                 smoker = st.selectbox("Smoker", ["yes", "no"])
@@ -120,7 +120,7 @@ class CRUDFormComponent:
             with st.form("update_form"):
                 cols = st.columns(3)
                 with cols[0]:
-                    age = st.number_input("Age", min_value=0, max_value=100, value=int(current_record['age']))
+                    age = st.number_input("Age", value=int(current_record['age']))
                     bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=float(current_record['bmi']))
                 with cols[1]:
                     sex = st.selectbox("Sex", ["male", "female"], index=0 if current_record['sex'] == 'male' else 1)
@@ -172,27 +172,57 @@ class CRUDFormComponent:
             format_func=lambda x: f"Record {x + 1}: Age {df.iloc[x]['age']}, Region {df.iloc[x]['region']}"
         )
 
-        if st.button("Delete Selected Records"):
-            if selected_indices:
-                try:
-                    for idx in selected_indices:
-                        deleted_record = df.loc[idx].to_dict()
-                        self.session_state.deleted_records_queue.append(deleted_record)
-                        self.change_history.add_change(
-                            change_type='delete',
-                            data=deleted_record
-                        )
+        # Thêm trạng thái xác nhận xóa vào session state nếu chưa có
+        if 'confirm_delete' not in st.session_state:
+            st.session_state.confirm_delete = False
+        if 'delete_success' not in st.session_state:
+            st.session_state.delete_success = False
 
-                    new_df = self.crud.xoa(selected_indices)
-                    self.session_state.modified_data = new_df
-                    
-                    self.session_state.show_success_message = f"Đã xóa {len(selected_indices)} bản ghi!"
-                    self._show_success_message(f"Đã xóa {len(selected_indices)} bản ghi!")
-                    
-                except Exception as e:
-                    st.error(f"Lỗi khi xóa bản ghi: {str(e)}")
-            else:
-                st.warning("Vui lòng chọn ít nhất một bản ghi để xóa.")
+        if selected_indices:
+            if st.button("Delete Selected Records"):
+                st.session_state.confirm_delete = True
+
+            # Hiển thị dialog xác nhận khi đã bấm nút xóa
+            if st.session_state.confirm_delete:
+                st.warning(f"⚠️ Bạn có chắc muốn xóa {len(selected_indices)} bản ghi đã chọn?")
+                
+                col1, col2 = st.columns([1,1])
+                
+                with col1:
+                    if st.button("✔️ Xác nhận xóa"):
+                        try:
+                            for idx in selected_indices:
+                                deleted_record = df.loc[idx].to_dict()
+                                self.session_state.deleted_records_queue.append(deleted_record)
+                                self.change_history.add_change(
+                                    change_type='delete',
+                                    data=deleted_record
+                                )
+
+                            new_df = self.crud.xoa(selected_indices)
+                            self.session_state.modified_data = new_df
+                            
+                            # Đặt trạng thái xóa thành công
+                            st.session_state.delete_success = True
+                            st.session_state.confirm_delete = False
+                            
+                        except Exception as e:
+                            st.error(f"Lỗi khi xóa bản ghi: {str(e)}")
+                            st.session_state.confirm_delete = False
+                            
+                with col2:
+                    if st.button("❌ Hủy"):
+                        st.session_state.confirm_delete = False
+                        st.rerun()
+
+            # Hiển thị thông báo thành công và nút OK
+            if st.session_state.delete_success:
+                st.success(f"✅ Đã xóa thành công {len(selected_indices)} bản ghi!")
+                if st.button("OK"):
+                    st.session_state.delete_success = False
+                    st.rerun()
+        else:
+            st.warning("Vui lòng chọn ít nhất một bản ghi để xóa.")
 
     def _show_success_message(self, message):
         if self.session_state.show_success_message == message:
